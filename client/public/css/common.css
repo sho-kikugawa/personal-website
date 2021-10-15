@@ -1,0 +1,30 @@
+.common-main {
+	margin-top: 10vh;
+	flex-shrink: 0;
+	width: 100%;
+}
+
+.common-grid {
+	max-width: 1440px;
+	width: calc(100% - 16px);
+	margin: 0 auto;
+}
+
+.common-content {
+	border-radius: 2px;
+	padding: 20px;
+	margin-bottom: 40px;
+}
+
+.site-nav:hover {
+	border-bottom: 4px solid #8bc34a;
+}
+
+.common-label {
+	display: inline-block;
+	margin-right: 20px;
+}
+
+.common-input {
+	margin-bottom: 20px;
+}

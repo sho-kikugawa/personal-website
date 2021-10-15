@@ -1,0 +1,12 @@
+div.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+	header.mdl-layout__header 
+		div.mdl-layout__header-row
+			//- Title
+			span.mdl-layout-title= title
+			div.mdl-layout-spacer
+			nav.mdl-navigation.mdl-layout--large-screen-only 
+				include links.pug
+	div.mdl-layout__drawer
+		span.mdl-layout-title Title 
+		nav.mdl-navigation 
+			include links.pug

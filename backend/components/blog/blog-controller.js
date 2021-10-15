@@ -27,9 +27,9 @@ async function getBlogList(req, res) {
 	if (`startAt` in req.query) {
 		startAt = req.query.startAt;
 	}
-	let blogData = await blogService.findBlog({}, startAt);
+	let blogData = await blogService.findBlogWithSort({}, '-createdAt', startAt);
 	logger.debug(`Getting a list of blogs: ${JSON.stringify(blogData, null, 4)}`);
-	res.render('blog/list', {blogs: blogData});
+	res.render('blog/list', {blogs: blogData, title: "Blog list"});
 }
 
 async function findBlogs(req, res) {

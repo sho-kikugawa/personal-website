@@ -28,8 +28,22 @@ async function findBlog(queryData, startAt=0) {
 		${JSON.stringify(queryData, null, 4)}. Starting from ${startAt}`);
 	// Search term should have a flag if it's title, content, or both
 	// Not sure how much impact this will have in searching the DB
-	return await model.find(queryData,
-		['-content']).exec();
+	return await model.find(queryData, ['-content'])
+		.skip(startAt)
+		.limit(20)
+		.exec();
+}
+
+async function findBlogWithSort(queryData, sortBy, startAt=0) {
+	logger.debug(`Finding blog with search term: 
+		${JSON.stringify(queryData, null, 4)}. Starting from ${startAt}`);
+	// Search term should have a flag if it's title, content, or both
+	// Not sure how much impact this will have in searching the DB
+	return await model.find(queryData,['-content'])
+		.skip(startAt)
+		.limit(20)
+		.sort(sortBy)
+		.exec();
 }
 
 async function updateBlog(title, subtitle, content) {
@@ -48,6 +62,7 @@ module.exports = {
 	getBlog,
 	getIfBlogExists,
 	findBlog,
+	findBlogWithSort,
 	updateBlog,
 	deleteBlog,
 }

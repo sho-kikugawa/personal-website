@@ -8,7 +8,7 @@ const editorCtrl = require('../components/editor/editor-controller');
 /* GET routers ***************************************************************/
 router.get('/create', (req, res) => {
 	//res.send("Editing something!");
-	res.render('editor/editor');
+	res.render('editor/editor', {title: "Create a blog"});
 });
 
 router.get('/list', (req, res) => {

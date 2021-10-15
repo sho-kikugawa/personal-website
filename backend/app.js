@@ -35,8 +35,8 @@ app.use(express.json())
 app.use(express.urlencoded({
 	extended: false
 }))
-app.use(express.static(path.join(__dirname, '../client/css')))
-app.use(express.static(path.join(__dirname, '../client/js')))
+console.log(`DIR NAME ${__dirname}`)
+app.use(express.static(path.join(__dirname, '../client/public')))
 
 /* Setup Routes **************************************************************/
 const indexRoutes = require('./routes/index-routes');

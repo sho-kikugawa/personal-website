@@ -1,0 +1,15 @@
+extends ../common/layout
+block content
+	h1 Searched for "#{searchTerm}"
+	table.table
+		thead 
+			tr 
+				td(scope="col") Title
+				td(scope="col") Summary
+				td(scope="col") Date posted
+		tbody 
+		each blog in blogs
+			tr 
+				td(scope="row") 
+					a(href=`blog?title=${blog.internalTitle}`) #{blog.title}
+				td(scope="row")= blog.subtitle

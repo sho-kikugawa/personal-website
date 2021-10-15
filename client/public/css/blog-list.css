@@ -1,0 +1,15 @@
+table {
+	max-width: 1280px;
+}
+
+td {
+	overflow: hidden;
+}
+
+td:nth-child(1) {
+	width: 25%;
+}
+
+td:nth-child(2) {
+	width: 50%;
+}
