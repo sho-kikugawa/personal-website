@@ -1,3 +1,5 @@
+const marked = require('marked');
+const sanitizer = require('sanitize-html');
 const { logger } = require("../../utils/logger");
 const blogService = require(`./blog-service`);
 
@@ -11,6 +13,8 @@ async function getBlog(req, res) {
 		let blogData = await blogService.getBlog(req.query.title);
 		logger.debug(`Retreived blog: ${JSON.stringify(blogData)}`);
 		if (blogData !== null) {
+			marked.sanitizer = sanitizer.sanitizeHtml;
+			blogData.content = marked(blogData.content);
 			// Do some mark up conversion here
 		}
 		else {
