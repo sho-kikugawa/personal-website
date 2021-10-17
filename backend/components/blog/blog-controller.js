@@ -5,12 +5,14 @@ const blogService = require(`./blog-service`);
 
 async function getBlog(req, res) {
 	logger.debug(`Request URL ${req.originalUrl}`)
-	logger.debug(`Request query = ${JSON.stringify(req.query)}`);
-	if (!req.query || ("title" in req.query) == false)  {
+	const BASE_PATH = "/blog/article/";
+	let internalTitle = req.originalUrl.substring(BASE_PATH.length);
+
+	if (await blogService.getIfBlogExists(internalTitle) === false)  {
 		res.redirect('/blogs');
 	}
 	else {
-		let blogData = await blogService.getBlog(req.query.title);
+		let blogData = await blogService.getBlog(internalTitle);
 		logger.debug(`Retreived blog: ${JSON.stringify(blogData)}`);
 		if (blogData !== null) {
 			marked.sanitizer = sanitizer.sanitizeHtml;
@@ -33,15 +35,31 @@ async function getBlogList(req, res) {
 	}
 	let blogData = await blogService.findBlogWithSort({}, '-createdAt', startAt);
 	logger.debug(`Getting a list of blogs: ${JSON.stringify(blogData, null, 4)}`);
-	res.render('blog/list', {blogs: blogData, title: "Blog list"});
+	blogData.forEach(blogEntry => {
+		if (blogEntry.createdAt === undefined) {
+			return;
+		}
+		let date = blogEntry.createdAt
+			.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+		date = date.substring(0, 10);
+		logger.debug(`${blogEntry.title}'s date: ${date}'`);
+		blogEntry.dateString = date;
+	})
+	res.render('blog/list', {blogs: blogData, title: "Blog list", searchBar: true});
 }
 
 async function findBlogs(req, res) {
+
 	let queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
 	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
 	let blogData = await blogService.findBlog(queryData);
 	logger.debug(`Blogs retrieved from search: ${JSON.stringify(blogData, null, 4)}`);
-	res.render('blog/search', {blogs: blogData, searchTerm: req.body.searchTerm});
+	res.render('blog/list', 
+		{
+			blogs: blogData, 
+			title: `Searched for "${req.body.searchTerm}"`, 
+			searchBar: false
+		});
 }
 
 module.exports = {

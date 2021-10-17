@@ -46,8 +46,16 @@ async function findBlogWithSort(queryData, sortBy, startAt=0) {
 		.exec();
 }
 
-async function updateBlog(title, subtitle, content) {
-	logger.debug(`Updating blog`);
+async function updateBlog(oldInternalTitle, updatedContent) {
+	logger.debug(`Updating ${oldInternalTitle} with ${JSON.stringify(updatedContent, null, 4)}`);
+	return await model.updateOne(
+		{ internalTitle: oldInternalTitle },
+		{
+			internalTitle: updatedContent.internalTitle,
+			title: updatedContent.title,
+			subtitle: updatedContent.subtitle,
+			content: updatedContent.content
+		});
 }
 
 async function deleteBlog(internalTitle) {

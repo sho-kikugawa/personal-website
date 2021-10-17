@@ -15,9 +15,11 @@ html
 			div.mdl-grid.common-grid
 				div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
 				div.mdl-cell.mdl-cell--8-col
-					div 
-						label.common-label Search the blog:
-						input.common-input(type="text", name="blogTitle", placeholder="Enter something... ")
+					if searchBar
+						div 
+							form(action='/blog/search', method="post")
+								label.common-label Search the blog:
+								input.common-input(type="text", name="searchTerm", placeholder="Seach by title")
 
 					table.mdl-data-table.mdl-shadow--2dp
 						thead 
@@ -29,6 +31,11 @@ html
 						each blog in blogs
 							tr 
 								td.mdl-data-table__cell--non-numeric 
-									a(href=`blog?title=${blog.internalTitle}`) #{blog.title}
+									a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
 								td.mdl-data-table__cell--non-numeric #{blog.subtitle} 
-								td.mdl-data-table__cell--non-numeric #{blog.updatedAt}
+								td.mdl-data-table__cell--non-numeric #{blog.dateString}
+								td.mdl-data-table__cell--non-numeric 
+									a(href=`editor/edit?title=${blog.internalTitle}`) Edit
+								td.mdl-data-table__cell--non-numeric 
+									form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
+										button Delete

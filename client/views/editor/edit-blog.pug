@@ -1,0 +1,17 @@
+extends ../common/layout
+block content
+	div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
+	div.mdl-cell.mdl-cell--8-col
+		div.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
+			form(action=`edit?title=${data.internalTitle}`, method="post")
+				label.common-label(style="width: 100px;") Title
+				input.common-input(type="text", name="title", placeholder="Enter a title" value=`${data.title}`)
+				br
+				label.common-label(style="width: 100px;") Summary 
+				input.common-input(type="text", name="subtitle", placeholder="Enter a summary" value=`${data.subtitle}`)
+				br
+				label Content (Markdown)
+				br
+				textarea(name="content", style="width: 100%; margin-bottom: 20px;", rows="24")=data.content 
+				br
+				button Submit

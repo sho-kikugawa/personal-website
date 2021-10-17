@@ -7,11 +7,8 @@ const blogCtrl = require('../components/blog/blog-controller');
 
 const logger = require('../utils/logger').logger;
 /* GET routers ***************************************************************/
-router.get('/', blogCtrl.getBlog);
-
-router.get('/search', (req, res) => {
-	res.render('blog/search');
-});
+// Capture all URLs with this base
+router.get("/article/*", blogCtrl.getBlog);
 
 /* POST routers **************************************************************/
 router.post('/search', blogCtrl.findBlogs);
