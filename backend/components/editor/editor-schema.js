@@ -5,8 +5,10 @@ let EditorSchema = new mongoose.Schema({
 		type: String,
 		trime: true,
 		unique: true
-	},	// 
+	},
+	 
 	password: String,
+
 	lastLogin: {
 		type: Date,
 		default: Date.now()

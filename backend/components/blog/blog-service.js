@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const model = mongoose.model('Blogs');
 const logger = require(`../../utils/logger`).logger;
 
-async function createBlog(linkTitle, title, subtitle, content) {
+async function postCreateBlog(linkTitle, title, subtitle, content) {
 	logger.debug(`Creating a new blog ${title}`);
 	
 	return await model.create({
@@ -58,7 +58,7 @@ async function updateBlog(oldInternalTitle, updatedContent) {
 		});
 }
 
-async function deleteBlog(internalTitle) {
+async function postDeleteBlog(internalTitle) {
 	logger.debug(`Deleting blog ${internalTitle}`);
 	return await model.deleteOne({
 		internalTitle: internalTitle
@@ -66,11 +66,11 @@ async function deleteBlog(internalTitle) {
 }
 
 module.exports = {
-	createBlog,
+	postCreateBlog,
 	getBlog,
 	getIfBlogExists,
 	findBlog,
 	findBlogWithSort,
 	updateBlog,
-	deleteBlog,
+	postDeleteBlog,
 }

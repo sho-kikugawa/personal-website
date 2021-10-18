@@ -13,15 +13,17 @@ router.get('/create', (req, res) => {
 
 router.get('/edit', editorCtrl.getEditBlog);
 
-router.get('/list', (req, res) => {
-	res.send(`Showing you a list of blogs to edit`);
-});
+router.get('/login', (req, res) => {
+	res.render('editor/login', {title: "Editor login"});
+})
 
 /* POST routers **************************************************************/
-router.post('/create', editorCtrl.createBlog);
+router.post('/login', editorCtrl.postEditorLogin);
+
+router.post('/create', editorCtrl.postCreateBlog);
 
 router.post('/edit', editorCtrl.postEditBlog);
 
-router.post('/delete', editorCtrl.deleteBlog);
+router.post('/delete', editorCtrl.postDeleteBlog);
 
 module.exports = router;

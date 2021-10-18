@@ -1,13 +1,13 @@
 const logger = require('../utils/logger').logger
 const mongoose = require('mongoose')
 
-function initMongo(schemaFiles=[]){
+function initMongo(dbParameters, schemaFiles=[]){
 	mongoose.Promise = global.Promise;
-	const MONGO_DB_URI = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/${process.env.DB_NAME}`
+	const MONGO_DB_URI = `mongodb://${dbParameters.ipAddress}:${dbParameters.portNumber}/${dbParameters.dbName}`
 	const MONGOOSE_OPTIONS = {
-		user: process.env.DB_USERNAME,
-		pass: process.env.DB_PASSWORD
-	}
+		user: dbParameters.username,
+		pass: dbParameters.password
+	};
 	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`)
 	logger.debug('[MongoDB] Connecting using options %o', MONGOOSE_OPTIONS)
 	mongoose.connect(MONGO_DB_URI, MONGOOSE_OPTIONS)

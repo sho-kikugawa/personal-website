@@ -15,15 +15,33 @@ logger.info(`Running server in a '${process.env.NODE_ENV}' environment`)
 
 /* Setup DB ******************************************************************/
 if (process.env.DB_TYPE === 'mongodb') {
-	const schemaFiles = ['../components/blog/blog-schema']
-	require('./dbs/mongo-db').initMongo(schemaFiles)
+	const schemaFiles = [
+		'../components/blog/blog-schema',
+		'../components/editor/editor-schema']
+	const dbParams = {
+		ipAddress: process.env.DB_IP,
+		portNumber: process.env.DB_PORT, 
+		dbName: process.env.DB_NAME, 
+		username: process.env.DB_USERNAME,
+		password: process.env.DB_PASSWORD
+	}
+	require('./dbs/mongo-db').initMongo(
+		dbParams,
+		schemaFiles);
 }
 
 /* Create Express Instance ***************************************************/
 var app = express()
 
 /* Setup Sessioning **********************************************************/
-
+logger.info(`Using cookie sessioning`);
+let session = require('cookie-session')({
+	name: process.env.COOKIE_NAME,
+	secret: process.env.COOKIE_SECRET,
+	maxAge: process.env.COOKIE_TTL_DEV
+});
+app.use(session);
+	
 /* Setup Middleware **********************************************************/
 app.set('views', path.join(__dirname, '../client/views'))
 app.set('view engine', 'pug')
@@ -35,7 +53,6 @@ app.use(express.json())
 app.use(express.urlencoded({
 	extended: false
 }))
-console.log(`DIR NAME ${__dirname}`)
 app.use(express.static(path.join(__dirname, '../client/public')))
 
 /* Setup Routes **************************************************************/
