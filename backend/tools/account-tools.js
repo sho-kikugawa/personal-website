@@ -16,6 +16,7 @@ async function createAccount(username, password) {
 	const salt = cryptoUtil.generateKey();
 	const hash = await cryptoUtil.getPasswordHash(password, salt);
 	const accountData = await model.create({
+		editorId: cryptoUtil.generateKey(),
 		username: username,
 		password: hash
 	});
@@ -23,6 +24,15 @@ async function createAccount(username, password) {
 	return accountData;
 }
 
+async function deleteAccount(username) {
+	const mongoose = require('mongoose');
+	const model = mongoose.model('Editor');
+	const deleteResult = await model.deleteOne({username: username});
+
+	return deleteResult;
+}
+
 module.exports = {
-	createAccount
+	createAccount,
+	deleteAccount
 }

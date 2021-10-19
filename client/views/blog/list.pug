@@ -34,8 +34,9 @@ html
 									a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
 								td.mdl-data-table__cell--non-numeric #{blog.subtitle} 
 								td.mdl-data-table__cell--non-numeric #{blog.dateString}
-								td.mdl-data-table__cell--non-numeric 
-									a(href=`editor/edit?title=${blog.internalTitle}`) Edit
-								td.mdl-data-table__cell--non-numeric 
-									form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
-										button Delete
+								if loggedIn == true
+									td.mdl-data-table__cell--non-numeric 
+										a(href=`editor/edit?title=${blog.internalTitle}`) Edit
+									td.mdl-data-table__cell--non-numeric 
+										form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
+											button Delete

@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger').logger;
+const formatJson = require('../../utils/logger').formatJson;
 const blogService = require('../blog/blog-service');
 const editorService = require('./editor-service');
 
@@ -48,16 +49,25 @@ async function postEditorLogin(req, res) {
 			req.body.editorPassword);
 		
 		if (editorData !== null) {
-			
+			logger.debug(`Editor data from login: ${formatJson(editorData)}`);
+			res.cookie(process.env.COOKIE_NAME, 'value', {
+				account: editorData.editorId
+			});
+			req.session.account = editorData.editorId;
+			req.session.save();
+			logger.debug(`Creating session for ${editorData.editorId}`);
+			logger.debug(`Session: ${formatJson(req.session)}`);
+			res.send(`Login successful! ${formatJson(req.session)}`)
 		}
-		res.cookie(process.env.COOKIE_NAME, 'value', {
-			account: accountId
-		})
-		req.session.account = accountId
-		req.session.save()
-		console.log(req.session)
-		logger.debug(`Creating session for ${accountId}`)
+		else {
+			res.send(`Login unsuccessful`);
+		}
 	}
+}
+
+async function postEditorLogout (req, res) {
+	req.session = null;
+	res.redirect('/');
 }
 
 async function postEditBlog(req, res) {
@@ -103,6 +113,7 @@ async function postDeleteBlog (req, res) {
 module.exports = {
 	getEditBlog,
 	postEditorLogin,
+	postEditorLogout,
 	postCreateBlog,
 	postEditBlog,
 	postDeleteBlog

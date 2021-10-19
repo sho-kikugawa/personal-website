@@ -69,5 +69,12 @@ httpLogger.stream = {
 	}
 }
 
-exports.logger = logger
-exports.httpLogger = httpLogger
+function formatJson(jsonObj) {
+	return JSON.stringify(jsonObj, null, 4);
+}
+
+module.exports = {
+	logger,
+	httpLogger,
+	formatJson
+}

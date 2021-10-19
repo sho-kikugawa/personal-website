@@ -5,7 +5,7 @@ const cryptoUtil = require('../../utils/crypto');
 
 async function editorLogin(username, password) {
 	const queryData = { username: username };
-	const filterData = 'password username';
+	const filterData = 'password username editorId';
 	let accountData = await model.findOne(queryData, filterData).exec();
 	let validLogin = false;
 

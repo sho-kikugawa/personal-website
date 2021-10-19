@@ -45,7 +45,12 @@ async function getBlogList(req, res) {
 		logger.debug(`${blogEntry.title}'s date: ${date}'`);
 		blogEntry.dateString = date;
 	})
-	res.render('blog/list', {blogs: blogData, title: "Blog list", searchBar: true});
+	res.render('blog/list', 
+		{	blogs: blogData, 
+			title: "Blog list", 
+			searchBar: true,
+			loggedIn: ('account' in req.session)
+		});
 }
 
 async function findBlogs(req, res) {

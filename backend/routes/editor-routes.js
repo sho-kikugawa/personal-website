@@ -20,6 +20,8 @@ router.get('/login', (req, res) => {
 /* POST routers **************************************************************/
 router.post('/login', editorCtrl.postEditorLogin);
 
+router.post('/logout', editorCtrl.postEditorLogout);
+
 router.post('/create', editorCtrl.postCreateBlog);
 
 router.post('/edit', editorCtrl.postEditBlog);

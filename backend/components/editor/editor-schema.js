@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
 let EditorSchema = new mongoose.Schema({
+	editorId: {
+		type: String,
+		unique: true,
+	},
+
 	username: {
 		type: String,
-		trime: true,
+		trim: true,
 		unique: true
 	},
 	 
