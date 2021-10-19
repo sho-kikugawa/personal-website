@@ -38,7 +38,7 @@ logger.info(`Using cookie sessioning`);
 let session = require('cookie-session')({
 	name: process.env.COOKIE_NAME,
 	secret: process.env.COOKIE_SECRET,
-	maxAge: process.env.COOKIE_TTL_DEV
+	maxAge: process.env.COOKIE_TTL
 });
 app.use(session);
 	
