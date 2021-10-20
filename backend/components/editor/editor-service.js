@@ -3,6 +3,18 @@ const model = mongoose.model('Editor');
 const logger = require(`../../utils/logger`).logger;
 const cryptoUtil = require('../../utils/crypto');
 
+async function createAccount(username, password) {
+	const salt = cryptoUtil.generateKey();
+	const hash = await cryptoUtil.getPasswordHash(password, salt);
+	const accountData = await model.create({
+		editorId: cryptoUtil.generateKey(),
+		username: username,
+		password: hash
+	});
+
+	return accountData;
+}
+
 async function editorLogin(username, password) {
 	const queryData = { username: username };
 	const filterData = 'password username editorId';
@@ -21,6 +33,14 @@ async function editorLogin(username, password) {
 	}
 }
 
+async function deleteAccount(username) {
+	const deleteResult = await model.deleteOne({username: username});
+	return deleteResult;
+}
+
+
 module.exports = {
+	createAccount,
 	editorLogin,
+	deleteAccount
 }

@@ -11,7 +11,7 @@ var morgan = require('morgan')
 /* Setup dependencies ********************************************************/
 const logger = require('./utils/logger').logger
 const httpLogger = require('./utils/logger').httpLogger
-logger.info(`Running server in a '${process.env.NODE_ENV}' environment`)
+logger.info(`Running server in a '${process.env.NODE_ENV}' environment`);
 
 /* Setup DB ******************************************************************/
 if (process.env.DB_TYPE === 'mongodb') {
@@ -62,6 +62,10 @@ const editorRoutes = require('./routes/editor-routes');
 app.use('/', indexRoutes);
 app.use('/blog', blogRoutes);
 app.use('/editor', editorRoutes)
+
+/* Perform other initialziations *********************************************/
+const editorCtrl = require('./components/editor/editor-controller')
+editorCtrl.setupAccessList(process.env.ACCESS_LIST_PATH);
 
 /* Launch the listeners ******************************************************/
 // catch 404 and forward to error handler

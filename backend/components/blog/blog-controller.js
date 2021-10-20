@@ -24,7 +24,11 @@ async function getBlog(req, res) {
 				title: "There's no blog here :<",
 				content: "No really, there isn't."}
 		}
-		res.render('blog/blog', blogData);
+		res.render('blog/blog', {
+			title: blogData.title,
+			data: blogData,
+			loggedIn: ('account' in req.session)
+		});
 	}
 }
 
@@ -54,7 +58,6 @@ async function getBlogList(req, res) {
 }
 
 async function findBlogs(req, res) {
-
 	let queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
 	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
 	let blogData = await blogService.findBlog(queryData);
@@ -62,8 +65,9 @@ async function findBlogs(req, res) {
 	res.render('blog/list', 
 		{
 			blogs: blogData, 
-			title: `Searched for "${req.body.searchTerm}"`, 
-			searchBar: false
+			title: `Searched forloggedIn: ('account' in req.session) "${req.body.searchTerm}"`, 
+			searchBar: false,
+			loggedIn: ('account' in req.session)
 		});
 }
 

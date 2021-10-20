@@ -11,25 +11,13 @@ const dbParams = {
 require('../dbs/mongo-db').initMongo(dbParams, schemaFiles);
 
 async function createAccount(username, password) {
-	const mongoose = require('mongoose');
-	const model = mongoose.model('Editor');
-	const salt = cryptoUtil.generateKey();
-	const hash = await cryptoUtil.getPasswordHash(password, salt);
-	const accountData = await model.create({
-		editorId: cryptoUtil.generateKey(),
-		username: username,
-		password: hash
-	});
-
-	return accountData;
+	const service = require('../components/editor/editor-service');
+	return await service.createAccount(username, password);
 }
 
 async function deleteAccount(username) {
-	const mongoose = require('mongoose');
-	const model = mongoose.model('Editor');
-	const deleteResult = await model.deleteOne({username: username});
-
-	return deleteResult;
+	const service = require('../components/editor/editor-service');
+	return await service.deleteAccount(username);
 }
 
 module.exports = {

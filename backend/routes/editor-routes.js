@@ -7,8 +7,12 @@ const editorCtrl = require('../components/editor/editor-controller');
 
 /* GET routers ***************************************************************/
 router.get('/create', (req, res) => {
-	//res.send("Editing something!");
-	res.render('editor/create-blog', {title: "Create a blog"});
+	if ('account' in req.session) {
+		res.render('editor/create-blog', {title: "Create a blog"});
+	}
+	else {
+		res.status(404).render('404', {title: 'Page not found'});
+	}
 });
 
 router.get('/edit', editorCtrl.getEditBlog);
