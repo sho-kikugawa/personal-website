@@ -6,7 +6,7 @@ This web site requires the following to run. It may run on older versions but th
 - Node.js version 16.11.1
 	- Node.js package dependencies are described in the package.json file
 - MongoDB 5.0.3
-- This site was developed on Ubuntu 20.04 LTS based distro
+- This site was developed on a Ubuntu 20.04 LTS based distro
 
 ## How to run
 - This is assuming you're using a terminal
@@ -18,7 +18,7 @@ This web site requires the following to run. It may run on older versions but th
 	- COOKIE_NAME: Name of the session cookie
 	- COOKIE_SECRET: Secret for the session cookie
 	- COOKIE_TTL: Cookie time-to-live (seconds)
-	- DB_TYPE: ```monngodb``
+	- DB_TYPE: ```monngodb```
 	- DB_IP: IP address or hostname where the database server is
 	- DB_PORT: Port that the database server is listening on
 	- DB_NAME: Name of the database to store collections

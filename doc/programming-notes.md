@@ -32,13 +32,11 @@ Contains the CSS code.
 ### client/public/js
 Contains the JavaScript code.
 
-### client/public/views
+### client/views
 Contains the HTML or rendering source code.
 
 ### docs
 Contains documentation.
-
-<hr>
 
 ## NPM Packages
 ### argon2
