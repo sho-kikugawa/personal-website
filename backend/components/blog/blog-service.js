@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const model = mongoose.model('Blogs');
 const logger = require(`../../utils/logger`).logger;
 
-async function postCreateBlog(linkTitle, title, subtitle, content) {
+async function createBlog(linkTitle, title, subtitle, content) {
 	logger.debug(`Creating a new blog ${title}`);
 	
 	return await model.create({
@@ -23,6 +23,10 @@ async function getIfBlogExists(linkTitle) {
 	return await model.exists({internalTitle: linkTitle});
 }
 
+async function getNumBlogs() {
+	return await model.countDocuments();
+}
+
 async function findBlog(queryData, startAt=0) {
 	logger.debug(`Finding blog with search term: 
 		${JSON.stringify(queryData, null, 4)}. Starting from ${startAt}`);
@@ -35,14 +39,14 @@ async function findBlog(queryData, startAt=0) {
 }
 
 async function findBlogWithSort(queryData, sortBy, startAt=0) {
-	logger.debug(`Finding blog with search term: 
-		${JSON.stringify(queryData, null, 4)}. Starting from ${startAt}`);
+	logger.debug(`Finding blog with search term: ${JSON.stringify(queryData, null, 4)}`);
+	logger.debug(`Starting from ${startAt}`);
 	// Search term should have a flag if it's title, content, or both
 	// Not sure how much impact this will have in searching the DB
 	return await model.find(queryData,['-content'])
+		.sort(sortBy)
 		.skip(startAt)
 		.limit(20)
-		.sort(sortBy)
 		.exec();
 }
 
@@ -58,19 +62,18 @@ async function updateBlog(oldInternalTitle, updatedContent) {
 		});
 }
 
-async function postDeleteBlog(internalTitle) {
+async function deleteBlog(internalTitle) {
 	logger.debug(`Deleting blog ${internalTitle}`);
-	return await model.deleteOne({
-		internalTitle: internalTitle
-	})
+	return await model.deleteOne({internalTitle: internalTitle});
 }
 
 module.exports = {
-	postCreateBlog,
+	createBlog,
 	getBlog,
 	getIfBlogExists,
+	getNumBlogs,
 	findBlog,
 	findBlogWithSort,
 	updateBlog,
-	postDeleteBlog,
+	deleteBlog,
 }

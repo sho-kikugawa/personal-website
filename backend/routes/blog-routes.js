@@ -11,6 +11,6 @@ const logger = require('../utils/logger').logger;
 router.get("/article/*", blogCtrl.getBlog);
 
 /* POST routers **************************************************************/
-router.post('/search', blogCtrl.findBlogs);
+router.post('/search', blogCtrl.postFindBlogs);
 
 module.exports = router;

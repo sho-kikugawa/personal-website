@@ -26,6 +26,7 @@ async function editorLogin(username, password) {
 	}
 	
 	if (validLogin === true) {
+		accountData.password = null;
 		return accountData;
 	}
 	else {

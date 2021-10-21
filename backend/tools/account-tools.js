@@ -1,5 +1,4 @@
 /* Grab all dependencies *****************************************************/
-const cryptoUtil = require('../utils/crypto');
 const schemaFiles = ['../components/editor/editor-schema'];
 const dbParams = {
 	ipAddress: "localhost",

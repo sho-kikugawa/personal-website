@@ -1,15 +1,16 @@
 const marked = require('marked');
 const sanitizer = require('sanitize-html');
-const { logger } = require("../../utils/logger");
+const { logger, formatJson } = require("../../utils/logger");
 const blogService = require(`./blog-service`);
 
+const PAGE_SKIP_STEP = 15;
+
 async function getBlog(req, res) {
-	logger.debug(`Request URL ${req.originalUrl}`)
 	const BASE_PATH = "/blog/article/";
 	let internalTitle = req.originalUrl.substring(BASE_PATH.length);
 
 	if (await blogService.getIfBlogExists(internalTitle) === false)  {
-		res.redirect('/blogs');
+		res.status(404).render('404', {title: 'Page not found'});
 	}
 	else {
 		let blogData = await blogService.getBlog(internalTitle);
@@ -17,12 +18,12 @@ async function getBlog(req, res) {
 		if (blogData !== null) {
 			marked.sanitizer = sanitizer.sanitizeHtml;
 			blogData.content = marked(blogData.content);
-			// Do some mark up conversion here
 		}
 		else {
+			logger.debug(`Failed to retrieve blog for ${internalTitle}`);
 			blogData = {
 				title: "There's no blog here :<",
-				content: "No really, there isn't."}
+				content: "No really, there isn't."};
 		}
 		res.render('blog/blog', {
 			title: blogData.title,
@@ -34,30 +35,38 @@ async function getBlog(req, res) {
 
 async function getBlogList(req, res) {
 	let startAt = 0;
-	if (`startAt` in req.query) {
-		startAt = req.query.startAt;
+	let currentPage = 1;
+	const blogCount = await blogService.getNumBlogs();
+	let pages = Math.ceil(blogCount / PAGE_SKIP_STEP);
+
+	if (pages === 0 ) {
+		pages = 1;
 	}
+	if (`startAt` in req.query) {
+		const queryNum = Number(req.query.startAt);
+		startAt = (isNaN(queryNum)) ? 0 : queryNum;
+		currentPage = Math.floor(startAt / PAGE_SKIP_STEP) + 1;
+	}
+
 	let blogData = await blogService.findBlogWithSort({}, '-createdAt', startAt);
-	logger.debug(`Getting a list of blogs: ${JSON.stringify(blogData, null, 4)}`);
 	blogData.forEach(blogEntry => {
 		if (blogEntry.createdAt === undefined) {
 			return;
 		}
-		let date = blogEntry.createdAt
-			.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+		let date = blogEntry.createdAt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 		date = date.substring(0, 10);
-		logger.debug(`${blogEntry.title}'s date: ${date}'`);
 		blogEntry.dateString = date;
 	})
 	res.render('blog/list', 
 		{	blogs: blogData, 
 			title: "Blog list", 
-			searchBar: true,
+			pages: pages,
+			page: currentPage, 
 			loggedIn: ('account' in req.session)
 		});
 }
 
-async function findBlogs(req, res) {
+async function postFindBlogs(req, res) {
 	let queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
 	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
 	let blogData = await blogService.findBlog(queryData);
@@ -74,5 +83,5 @@ async function findBlogs(req, res) {
 module.exports = {
 	getBlog,
 	getBlogList,
-	findBlogs
+	postFindBlogs
 }

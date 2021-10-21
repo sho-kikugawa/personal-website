@@ -4,39 +4,47 @@ html
 		block head
 			title= title
 			block stylesheets
-				link(rel='stylesheet', href='/css/material.min.css')
+				link(rel='stylesheet', href='/css/material.blue_grey-blue.min.css')
 				link(rel='stylesheet', href='/css/common.css')
 				link(rel='stylesheet', href='/css/blog-list.css')
 			block scripts
-				script(src="/js/material.min.js") 
+				script(src="/js/material.blue_grey-blue.minjs") 
 	body
 		include ../common/navbar
 		main.mdl-layout__content.common-main
 			div.mdl-grid.common-grid
 				div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
-				div.mdl-cell.mdl-cell--8-col
-					if searchBar
-						div 
-							form(action='/blog/search', method="post")
-								label.common-label Search the blog:
-								input.common-input(type="text", name="searchTerm", placeholder="Seach by title")
-
+				div.mdl-cell.mdl-cell--8-col.mdl-cell--4-col-phone
 					table.mdl-data-table.mdl-shadow--2dp
 						thead 
 							tr 
 								td.mdl-data-table__cell--non-numeric Title
 								td.mdl-data-table__cell--non-numeric Summary
-								td.mdl-data-table__cell--non-numeric Date posted
+								td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone Date posted
 						tbody 
 						each blog in blogs
 							tr 
 								td.mdl-data-table__cell--non-numeric 
 									a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
 								td.mdl-data-table__cell--non-numeric #{blog.subtitle} 
-								td.mdl-data-table__cell--non-numeric #{blog.dateString}
+								td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone #{blog.dateString}
 								if loggedIn == true
-									td.mdl-data-table__cell--non-numeric 
+									td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone 
 										a(href=`editor/edit?title=${blog.internalTitle}`) Edit
-									td.mdl-data-table__cell--non-numeric 
+									td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone
 										form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
 											button Delete
+					div.paginator
+						- if (page == 1) 
+							a.page-left.disabled-button.mdl-color-text--grey-400 &lt;
+						- else 
+							a.page-left(href=`?startAt=${(page - 2) * 15}`) &lt;
+						- for (let i = 1; i <= pages && i < 9; i++) 
+							- if(page == i)
+								a.page-number.page-selected= i
+							- else 
+								a.page-number(href=`?startAt=${(i-1)*15}`)= i
+						- if (page === pages)
+							a.page-right.disabled-button.mdl-color-text--grey-400 &gt;
+						- else
+							a.page-right(href=`?startAt=${page * 15}`) &gt;

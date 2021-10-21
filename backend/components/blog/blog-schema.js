@@ -8,7 +8,7 @@ let BlogSchema = new mongoose.Schema({
 	},	// 
 	title: String,			// Big bold title
 	subtitle: String,		// Summary
-	content: String,		// Markdown? content of the article
+	content: String,		// Markdown content of the article
 	tags: [String],			// Array of tags
 },
 {timestamps: true}); 
