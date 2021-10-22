@@ -3,7 +3,8 @@
 	- [x] Markdown support
 	- [x] Articles retrieved from a database to minimize the number of HTML pages needed to create.
 	- [x] Blog URLs look "normal", rather than using a query (e.g. ```something.com/page/article``` rather than  ```something.com/page?key=article```)
-	- [ ] Using pagination for article listing
+	- [ ] Limit how many blog appear on the listing
+	- [ ] Have a way to navigate through blog listings
 - [ ] Pushing content while site is live
 	- [x] Separate URL for logging in
 	- [x] Ability to log out
@@ -12,8 +13,14 @@
 	- [x] Articles can be updated
 	- [X] Editors have a unique ID
 	- [X] Only allowed unique IDs are accepted
-- [ ] Security features
+- [ ] Security
+	- [ ] Sanitize input strings!
 	- [ ] Must support HTTPS
+- [ ] Reliability
+	- [ ] Work with another web server (Node.js by itself may be iffy)
+	- [ ] Evaluate how to handle errors
+	- [ ] Logging to a file
+	- [ ] Find a "keep-alive" monitor like nodemon
 
 # Nice to have
 - [ ] Visitor count

@@ -20,6 +20,10 @@ router.get('/about', (req, res) => {
 	});
 })
 
+// Will default to the first page
 router.get('/blogs', blogController.getBlogList);
+
+// Will check what's after page/ to figure out which page it is
+router.get('/blogs/page/*', blogController.getBlogList);
 
 module.exports = router

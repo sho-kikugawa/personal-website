@@ -38,7 +38,7 @@ async function findBlog(queryData, startAt=0) {
 		.exec();
 }
 
-async function findBlogWithSort(queryData, sortBy, startAt=0) {
+async function findBlogWithSort(queryData, sortBy, limit=15, startAt=0) {
 	logger.debug(`Finding blog with search term: ${JSON.stringify(queryData, null, 4)}`);
 	logger.debug(`Starting from ${startAt}`);
 	// Search term should have a flag if it's title, content, or both
@@ -46,7 +46,7 @@ async function findBlogWithSort(queryData, sortBy, startAt=0) {
 	return await model.find(queryData,['-content'])
 		.sort(sortBy)
 		.skip(startAt)
-		.limit(20)
+		.limit(limit)
 		.exec();
 }
 

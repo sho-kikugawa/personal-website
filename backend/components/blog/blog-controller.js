@@ -3,8 +3,6 @@ const sanitizer = require('sanitize-html');
 const { logger, formatJson } = require("../../utils/logger");
 const blogService = require(`./blog-service`);
 
-const PAGE_SKIP_STEP = 15;
-
 async function getBlog(req, res) {
 	const BASE_PATH = "/blog/article/";
 	let internalTitle = req.originalUrl.substring(BASE_PATH.length);
@@ -34,36 +32,46 @@ async function getBlog(req, res) {
 }
 
 async function getBlogList(req, res) {
+	const PAGE_SKIP_STEP = 15;
 	let startAt = 0;
-	let currentPage = 1;
-	const blogCount = await blogService.getNumBlogs();
-	let pages = Math.ceil(blogCount / PAGE_SKIP_STEP);
+	let pageNum = 1;
+	const blogPages = Math.floor(await blogService.getNumBlogs() / PAGE_SKIP_STEP);
+	if (req.originalUrl.search("page") > -1) {
+		const BASE_PATH = "/blogs/page/";
+		pageNum = req.originalUrl.substring(BASE_PATH.length);
+		pageNum = parseInt(pageNum, 10);
+		logger.debug(`Page Num: ${pageNum}`);
 
-	if (pages === 0 ) {
-		pages = 1;
-	}
-	if (`startAt` in req.query) {
-		const queryNum = Number(req.query.startAt);
-		startAt = (isNaN(queryNum)) ? 0 : queryNum;
-		currentPage = Math.floor(startAt / PAGE_SKIP_STEP) + 1;
-	}
-
-	let blogData = await blogService.findBlogWithSort({}, '-createdAt', startAt);
-	blogData.forEach(blogEntry => {
-		if (blogEntry.createdAt === undefined) {
-			return;
+		if (isNaN(pageNum) === false) {
+			startAt = pageNum * PAGE_SKIP_STEP;
 		}
-		let date = blogEntry.createdAt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
-		date = date.substring(0, 10);
-		blogEntry.dateString = date;
-	})
-	res.render('blog/list', 
-		{	blogs: blogData, 
-			title: "Blog list", 
-			pages: pages,
-			page: currentPage, 
-			loggedIn: ('account' in req.session)
-		});
+		else {
+			pageNum = 1;
+		}
+	}
+
+	if (pageNum > blogPages) {
+		res.redirect('/blogs')
+	}
+	else {
+		let blogData = await blogService.findBlogWithSort({}, '-createdAt', PAGE_SKIP_STEP, startAt);
+		blogData.forEach(blogEntry => {
+			if (blogEntry.createdAt === undefined) {
+				return;
+			}
+			let date = blogEntry.createdAt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+			date = date.substring(0, 10);
+			blogEntry.dateString = date;
+		})
+	
+		res.render('blog/list', 
+			{	blogs: blogData, 
+				title: "Blog list", 
+				currentPage: pageNum,
+				lastPage: (blogPages === pageNum),
+				loggedIn: ('account' in req.session)
+			});
+	}
 }
 
 async function postFindBlogs(req, res) {

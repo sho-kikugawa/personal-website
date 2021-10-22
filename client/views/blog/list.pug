@@ -34,17 +34,10 @@ html
 									td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone
 										form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
 											button Delete
-					div.paginator
-						- if (page == 1) 
-							a.page-left.disabled-button.mdl-color-text--grey-400 &lt;
-						- else 
-							a.page-left(href=`?startAt=${(page - 2) * 15}`) &lt;
-						- for (let i = 1; i <= pages && i < 9; i++) 
-							- if(page == i)
-								a.page-number.page-selected= i
-							- else 
-								a.page-number(href=`?startAt=${(i-1)*15}`)= i
-						- if (page === pages)
-							a.page-right.disabled-button.mdl-color-text--grey-400 &gt;
-						- else
-							a.page-right(href=`?startAt=${page * 15}`) &gt;
+					div.blog-list-nav
+						- if (currentPage === 2) 
+							a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs`) Previous Page
+						- else if (currentPage > 2)
+							a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage-1}`) Previous Page
+						- if (lastPage === false) 
+							a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage+1}` style="float:right;") Next Page
