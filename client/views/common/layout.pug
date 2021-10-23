@@ -1,26 +1,10 @@
 doctype html
 html
 	head
-		block head
-			title= title
-			block stylesheets
-				link(rel='stylesheet', href='/css/material.blue_grey-blue.min.css')
-				link(rel='stylesheet', href='/css/common.css')
-			block scripts
-				script(src="/js/material.blue_grey-blue.minjs") 
+		include ./head.pug
 	body
 		div.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-			header.mdl-layout__header 
-				div.mdl-layout__header-row
-					//- Title
-					span.mdl-layout-title= title
-					div.mdl-layout-spacer
-					nav.mdl-navigation.mdl-layout--large-screen-only 
-						include links.pug
-			div.mdl-layout__drawer.mdl-layout--small-screen-only
-				span.mdl-layout-title Title 
-				nav.mdl-navigation 
-					include links.pug
-		main.mdl-layout__content.common-main
-			div.mdl-grid.common-grid
-				block content
+			include ./navbar.pug
+			main.mdl-layout__content.common-main
+				div.mdl-grid.common-grid
+					block content

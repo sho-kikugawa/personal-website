@@ -1,8 +1,8 @@
 extends common/layout
 block content
 	div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
-	div.mdl-cell.mdl-cell--3-col.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
-		img(src="/img/89173195.jpeg", alt="A cat!" style="width: 100%;")
+	div(class="mdl-cell mdl-cell--3-col mdl-cell--4-col-phone mdl-color--white mdl-shadow--4dp " + 
+			"mdl-color-text--grey-800 common-content picture-card")
 	div.mdl-cell.mdl-cell--5-col.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
 		h3 Hello world!
 		p 
@@ -19,8 +19,10 @@ block content
 		p 
 			strong Stuff I've done
 		ul 
-			li Git Hub repo: 
-			li Articles written for Maximum PC (now PC Gamer)
+			li 
+				a(href="https://www.github.com/sho-kikugawa" target="_blank") Git Hub repo
+			li 
+				a(href="https://www.pcgamer.com/author/sho-kikugawa/" target="_blank") Articles written for Maximum PC (now PC Gamer)
 			li An assortment of articles on this website
 
 		p

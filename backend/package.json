@@ -14,7 +14,7 @@
 		"url": "https://github.com/shuffyiosys/rp-navi.git"
 	},
 	"dependencies": {
-		"argon2": "^0.28.2",
+		"argon2": "^0.24.1",
 		"cookie-parser": "^1.4.5",
 		"cookie-session": "^1.4.0",
 		"debug": "^4.3.2",
@@ -25,9 +25,9 @@
 		"http-errors": "~1.8.0",
 		"lodash": "^4.17.21",
 		"marked": "^3.0.7",
-		"mongoose": "^6.0.10",
+		"mongoose": "^6.0.12",
 		"morgan": "~1.10.0",
-		"nodemon": "^2.0.13",
+		"nodemon": "^2.0.14",
 		"pug": "^3.0.2",
 		"sanitize-html": "^2.5.2",
 		"uuid": "^8.3.2",
@@ -36,7 +36,7 @@
 	"devDependencies": {
 		"chai": "^4.3.4",
 		"chai-http": "^4.3.0",
-		"eslint": "^8.0.0",
-		"mocha": "^9.1.2"
+		"eslint": "^8.1.0",
+		"mocha": "^9.1.3"
 	}
 }

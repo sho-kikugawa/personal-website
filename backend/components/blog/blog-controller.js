@@ -4,8 +4,8 @@ const { logger, formatJson } = require("../../utils/logger");
 const blogService = require(`./blog-service`);
 
 async function getBlog(req, res) {
-	const BASE_PATH = "/blog/article/";
-	let internalTitle = req.originalUrl.substring(BASE_PATH.length);
+	const basePath = "/blog/article/";
+	let internalTitle = req.originalUrl.substring(basePath.length);
 
 	if (await blogService.getIfBlogExists(internalTitle) === false)  {
 		res.status(404).render('404', {title: 'Page not found'});
@@ -32,28 +32,40 @@ async function getBlog(req, res) {
 }
 
 async function getBlogList(req, res) {
-	const PAGE_SKIP_STEP = 15;
+	const pageStep = 15;
+	const numBlogs = await blogService.getNumBlogs();
+	const blogPages = Math.floor(numBlogs / pageStep) + 1;
 	let startAt = 0;
 	let pageNum = 1;
-	const blogPages = Math.floor(await blogService.getNumBlogs() / PAGE_SKIP_STEP);
-	if (req.originalUrl.search("page") > -1) {
-		const BASE_PATH = "/blogs/page/";
-		pageNum = req.originalUrl.substring(BASE_PATH.length);
-		pageNum = parseInt(pageNum, 10);
 
-		if (isNaN(pageNum) === false) {
-			startAt = pageNum * PAGE_SKIP_STEP;
-		}
-		else {
-			pageNum = 1;
-		}
-	}
-
-	if (pageNum > blogPages) {
-		res.redirect('/blogs')
+	if (numBlogs === 0) {
+		res.render('blog/list', 
+			{	currentPage: -1, 
+				title: "Blog list", 
+				loggedIn: ('account' in req.session)
+			});
 	}
 	else {
-		let blogData = await blogService.findBlogWithSort({}, '-createdAt', PAGE_SKIP_STEP, startAt);
+		// Parse the page number from the URL
+		if (req.originalUrl.search("page") > -1) {
+			const basePath = "/blogs/page/";
+			pageNum = req.originalUrl.substring(basePath.length);
+			pageNum = parseInt(pageNum, 10);
+
+			if (isNaN(pageNum) === false) {
+				startAt = (pageNum - 1) * pageStep;
+			}
+			else {
+				pageNum = 1;
+			}
+		}
+
+		// Cap the page number to the number maximum number of pages.
+		if (pageNum > blogPages) {
+			pageNum = blogPages;
+		}
+
+		let blogData = await blogService.findBlogWithSort({}, '-createdAt', pageStep, startAt);
 		blogData.forEach(blogEntry => {
 			if (blogEntry.createdAt === undefined) {
 				return;
@@ -62,7 +74,7 @@ async function getBlogList(req, res) {
 			date = date.substring(0, 10);
 			blogEntry.dateString = date;
 		})
-	
+
 		res.render('blog/list', 
 			{	blogs: blogData, 
 				title: "Blog list", 

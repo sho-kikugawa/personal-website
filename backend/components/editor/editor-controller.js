@@ -1,5 +1,5 @@
-const logger = require('../../utils/logger').logger;
-const formatJson = require('../../utils/logger').formatJson;
+const sanitizer = require('sanitize-html');
+const { logger, formatJson } = require("../../utils/logger");
 const blogService = require('../blog/blog-service');
 const editorService = require('./editor-service');
 
@@ -41,12 +41,11 @@ async function postCreateBlog(req, res) {
 		res.render('editor/editing-result', {result: "This blog exists :<"})
 	}
 	else {
-		// Need to sanitize all the inputs here, just in case.
 		let blogData = await blogService.createBlog(
 			urlTitle, 
-			req.body.blogTitle,
-			req.body.blogSubtitle,
-			req.body.blogContent);
+			sanitizer(req.body.blogTitle),
+			sanitizer(req.body.blogSubtitle),
+			sanitizer(req.body.blogContent));
 		logger.debug(`blogData if created: ${formatJson(blogData)}`);
 		res.render('editor/editing-result', {result: `Blog posted!`});
 	}

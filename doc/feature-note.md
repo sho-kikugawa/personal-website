@@ -15,8 +15,8 @@
 	- [X] Only allowed unique IDs are accepted
 - [ ] Security
 	- [ ] Sanitize input strings!
-		- [ ] Sanitize blog contents
-		- [ ] Sanitize URL
+		- [X] Sanitize blog contents
+		- [ ] Sanitize URL (?)
 	- [ ] Must support HTTPS
 		- [X] Works with self-signed cert
 		- [ ] Works with a cert from a CA

@@ -1,0 +1,26 @@
+table.mdl-data-table.mdl-shadow--2dp
+	thead 
+		tr 
+			td.mdl-data-table__cell--non-numeric Title
+			td.mdl-data-table__cell--non-numeric Summary
+			td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone Date posted
+	tbody 
+	each blog in blogs
+		tr 
+			td.mdl-data-table__cell--non-numeric 
+				a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
+			td.mdl-data-table__cell--non-numeric #{blog.subtitle} 
+			td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone #{blog.dateString}
+			if loggedIn == true
+				td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone 
+					a(href=`editor/edit?title=${blog.internalTitle}`) Edit
+				td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone
+					form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
+						button Delete
+div.blog-list-nav
+	- if (currentPage === 2) 
+		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs`) Previous Page
+	- else if (currentPage > 2)
+		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage-1}`) Previous Page
+	- if (lastPage === false) 
+		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage+1}` style="float:right;") Next Page

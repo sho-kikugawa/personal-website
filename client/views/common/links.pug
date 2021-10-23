@@ -3,4 +3,4 @@ a.site-nav.mdl-navigation__link.mdl-typography--text-uppercase(href="/blogs") Bl
 a.site-nav.mdl-navigation__link.mdl-typography--text-uppercase(href="/about") About
 if loggedIn == true 
 	form(action="/editor/logout" method="post")
-		input.site-nav.mdl-typography--text-uppercase(type="submit" value="Logout" style="background: none; border: none; color: #EEE; cursor: pointer;")
+		button.navbar-button.mdl-navigation__link.mdl-typography--text-uppercase Logout

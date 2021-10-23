@@ -3,7 +3,7 @@ const schemaFiles = ['../components/editor/editor-schema'];
 const dbParams = {
 	ipAddress: "localhost",
 	portNumber: 27017, 
-	dbName: "Test", 
+	dbName: "sk-site", 
 	username: "",
 	password: ""
 }
