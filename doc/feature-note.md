@@ -1,10 +1,10 @@
 # Required
-- [ ] Showing articles
+- [X] Showing articles
 	- [x] Markdown support
 	- [x] Articles retrieved from a database to minimize the number of HTML pages needed to create.
 	- [x] Blog URLs look "normal", rather than using a query (e.g. ```something.com/page/article``` rather than  ```something.com/page?key=article```)
-	- [ ] Limit how many blog appear on the listing
-	- [ ] Have a way to navigate through blog listings
+	- [X] Limit how many blog appear on the listing
+	- [X] Have a way to navigate through blog listings
 - [ ] Pushing content while site is live
 	- [x] Separate URL for logging in
 	- [x] Ability to log out
@@ -15,7 +15,12 @@
 	- [X] Only allowed unique IDs are accepted
 - [ ] Security
 	- [ ] Sanitize input strings!
+		- [ ] Sanitize blog contents
+		- [ ] Sanitize URL
 	- [ ] Must support HTTPS
+		- [X] Works with self-signed cert
+		- [ ] Works with a cert from a CA
+	- [ ] - Harden sessioning tokens
 - [ ] Reliability
 	- [ ] Work with another web server (Node.js by itself may be iffy)
 	- [ ] Evaluate how to handle errors
@@ -30,4 +35,5 @@
 	- [ ] By title
 	- [ ] By subtitle/summary
 	- [ ] By tags
+	- [ ] Sanitize search inputs (when implemented)
 - [ ] Find a WYSIWYG markdown editor

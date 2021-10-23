@@ -23,7 +23,10 @@ router.get('/about', (req, res) => {
 // Will default to the first page
 router.get('/blogs', blogController.getBlogList);
 
-// Will check what's after page/ to figure out which page it is
+// Pages in the list are accessed with /blogs/page/#
 router.get('/blogs/page/*', blogController.getBlogList);
+
+// Redirect all URLs after /blogs/ to just /blogs
+router.get('/blogs/*', (req, res) => {res.redirect('/blogs')});
 
 module.exports = router

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const model = mongoose.model('Blogs');
-const logger = require(`../../utils/logger`).logger;
+const {logger, formatJson} = require(`../../utils/logger`);
 
 async function createBlog(linkTitle, title, subtitle, content) {
 	logger.debug(`Creating a new blog ${title}`);
@@ -20,6 +20,7 @@ async function getBlog(internalTitle) {
 }
 
 async function getIfBlogExists(linkTitle) {
+	logger.debug(`Checking if blog with linkTitle ${linkTitle} exists`);
 	return await model.exists({internalTitle: linkTitle});
 }
 

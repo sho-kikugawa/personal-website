@@ -14,8 +14,8 @@ async function getBlog(req, res) {
 		let blogData = await blogService.getBlog(internalTitle);
 		logger.debug(`Retreived blog: ${JSON.stringify(blogData)}`);
 		if (blogData !== null) {
-			marked.sanitizer = sanitizer.sanitizeHtml;
 			blogData.content = marked(blogData.content);
+			blogData.content = sanitizer(blogData.content);
 		}
 		else {
 			logger.debug(`Failed to retrieve blog for ${internalTitle}`);
@@ -40,7 +40,6 @@ async function getBlogList(req, res) {
 		const BASE_PATH = "/blogs/page/";
 		pageNum = req.originalUrl.substring(BASE_PATH.length);
 		pageNum = parseInt(pageNum, 10);
-		logger.debug(`Page Num: ${pageNum}`);
 
 		if (isNaN(pageNum) === false) {
 			startAt = pageNum * PAGE_SKIP_STEP;

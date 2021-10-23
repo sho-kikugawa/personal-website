@@ -41,6 +41,7 @@ async function postCreateBlog(req, res) {
 		res.render('editor/editing-result', {result: "This blog exists :<"})
 	}
 	else {
+		// Need to sanitize all the inputs here, just in case.
 		let blogData = await blogService.createBlog(
 			urlTitle, 
 			req.body.blogTitle,
