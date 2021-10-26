@@ -1,12 +1,14 @@
-/** Get dotenv settings */
-//require('dotenv-flow').config()
-
 /* Grab all dependencies *****************************************************/
-var createError = require('http-errors')
-var express = require('express')
-var path = require('path')
-var cookieParser = require('cookie-parser')
-var morgan = require('morgan')
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var morgan = require('morgan');
+const helmet = require('helmet');
+const xssClean = require('xss-clean');
+const hpp = require('hpp');
+const mongoSantiize = require('express-mongo-sanitize');
+const rateLimit = require('express-rate-limit');
 
 /* Setup dependencies ********************************************************/
 const logger = require('./utils/logger').logger
@@ -32,6 +34,18 @@ if (process.env.DB_TYPE === 'mongodb') {
 
 /* Create Express Instance ***************************************************/
 var app = express()
+
+/* Setup secure packages *****************************************************/
+app.use(helmet());
+app.use(xssClean());
+app.use(hpp());
+app.use(mongoSantiize());
+
+let limiter = rateLimit({
+	windowMs: 10 * 60 * 1000,
+	max: 100
+});
+app.use(limiter);
 
 /* Setup Sessioning **********************************************************/
 logger.info(`Using cookie sessioning`);

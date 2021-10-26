@@ -45,7 +45,9 @@ async function postCreateBlog(req, res) {
 			urlTitle, 
 			sanitizer(req.body.blogTitle),
 			sanitizer(req.body.blogSubtitle),
-			sanitizer(req.body.blogContent));
+			
+			// This will get sanitized on display
+			req.body.blogContent);
 		logger.debug(`blogData if created: ${formatJson(blogData)}`);
 		res.render('editor/editing-result', {result: `Blog posted!`});
 	}
