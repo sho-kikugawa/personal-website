@@ -15,6 +15,29 @@ const logger = require('./utils/logger').logger
 const httpLogger = require('./utils/logger').httpLogger
 logger.info(`Running server in a '${process.env.NODE_ENV}' environment`);
 
+const requiredEnvVars = ['PORT', 'DB_TYPE', 'DB_IP', 'DB_PORT', 'DB_NAME',
+	'SESSION_NAME', 'SESSION_SECRET', 'SESSION_TTL' ];
+
+const usefulEnvVars = [ 'HTTPS_PORT', 'TLS_FILES_PATH', 'TLS_CERT_FILENAME',
+	'TLS_KEY_FILENAME',	'DB_USERNAME', 'DB_PASSWORD'];
+
+/** Verify required environment variables and exit if they're not defined */
+requiredEnvVars.forEach((envName) => {
+	if ((envName in process.env) === false || process.env[envName] === '') {
+		logger.error(`${envName} is needed but not defined, exiting`);
+		process.exit();
+	}
+})
+
+/** Verify useful environment variables, but warn if they're not defined */
+usefulEnvVars.forEach((envName) => {
+	if ((envName in process.env) === false || process.env[envName] === '') {
+		logger.warn(`${envName} is not defined, you may want to check ` + 
+			`this is intended`);
+	}
+})
+
+
 /* Setup DB ******************************************************************/
 if (process.env.DB_TYPE === 'mongodb') {
 	const schemaFiles = [
@@ -48,12 +71,46 @@ let limiter = rateLimit({
 app.use(limiter);
 
 /* Setup Sessioning **********************************************************/
-logger.info(`Using cookie sessioning`);
-let session = require('cookie-session')({
-	name: process.env.COOKIE_NAME,
-	secret: process.env.COOKIE_SECRET,
-	maxAge: process.env.COOKIE_TTL
-});
+let session;
+
+if (process.env.SESSION_TYPE == "cookie") {
+	logger.info(`Using cookie sessioning`)
+	session = require('cookie-session')({
+		name: process.env.SESSION_NAME,
+		secret: process.env.SESSION_SECRET,
+		maxAge: process.env.SESSION_TTL
+	})
+	app.use(session)
+}
+else if (process.env.SESSION_TYPE == "redis") {
+	logger.info(`Using Redis sessioning`)
+	session = require('express-session')
+	const redisStore = require('connect-redis')(session);
+	let sessionParams = {
+		secret: process.env.SESSION_SECRET,
+		name: process.env.SESSION_NAME,
+		resave: true,
+		saveUninitialized: true,
+		cookie: { secure: false }, // Note that the cookie-parser module is no longer needed
+		store: new redisStore({ host: 'localhost', port: 6379, client: redisClient, ttl: 86400 }),
+	}
+	session = require('express-session')(sessionParams)
+
+	redisClient.on('error', (err) => {
+		console.log('Redis error: ', err);
+	});
+
+	app.use(session)
+}
+else {
+	logger.info(`Using Express sessioning`)
+	session = require('express-session')({
+		secret: process.env.SESSION_SECRET,
+		resave: true,
+		saveUninitialized: true
+	})
+	app.use(session)
+}
 app.use(session);
 	
 /* Setup Middleware **********************************************************/
@@ -78,8 +135,7 @@ app.use('/blog', blogRoutes);
 app.use('/editor', editorRoutes)
 
 /* Perform other initialziations *********************************************/
-const editorCtrl = require('./components/editor/editor-controller')
-editorCtrl.setupAccessList(process.env.ACCESS_LIST_PATH);
+const editorCtrl = require('./components/editor/editor-controller');
 
 /* Launch the listeners ******************************************************/
 // catch 404 and forward to error handler

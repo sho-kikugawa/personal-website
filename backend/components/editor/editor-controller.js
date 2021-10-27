@@ -64,8 +64,7 @@ async function postEditorLogin(req, res) {
 		let editorData = await editorService.editorLogin(
 			req.body.editorUsername, 
 			req.body.editorPassword);
-		if (editorData !== null && 
-			accessList.findIndex(element => element == editorData.editorId) > -1) 
+		if (editorData !== null)
 		{
 			logger.info(`Editor ${editorData.username} logged in`);
 			logger.debug(`Editor data from login: ${formatJson(editorData)}`);
