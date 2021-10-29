@@ -20,7 +20,7 @@
 	- [ ] Must support HTTPS
 		- [X] Works with self-signed cert
 		- [ ] Works with a cert from a CA
-	- [ ] - Harden sessioning tokens
+	- [X] - Harden sessioning tokens
 - [ ] Reliability
 	- [ ] Work with another web server (Node.js by itself may be iffy)
 	- [ ] Evaluate how to handle errors

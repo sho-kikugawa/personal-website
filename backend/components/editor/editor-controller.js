@@ -68,11 +68,7 @@ async function postEditorLogin(req, res) {
 		{
 			logger.info(`Editor ${editorData.username} logged in`);
 			logger.debug(`Editor data from login: ${formatJson(editorData)}`);
-			if (req.session) {
-				req.session = null;
-				req.session = {};
-			}
-			res.cookie(process.env.COOKIE_NAME, 'value', {
+			res.cookie(process.env.SESSION_NAME, 'value', {
 				account: editorData.editorId
 			});
 			req.session.account = editorData.editorId;

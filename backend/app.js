@@ -37,7 +37,6 @@ usefulEnvVars.forEach((envName) => {
 	}
 })
 
-
 /* Setup DB ******************************************************************/
 if (process.env.DB_TYPE === 'mongodb') {
 	const schemaFiles = [
@@ -74,37 +73,19 @@ app.use(limiter);
 let session;
 
 if (process.env.SESSION_TYPE == "cookie") {
-	logger.info(`Using cookie sessioning`)
+	logger.info(`Using cookie sessioning`);
 	session = require('cookie-session')({
 		name: process.env.SESSION_NAME,
 		secret: process.env.SESSION_SECRET,
-		maxAge: process.env.SESSION_TTL
-	})
-	app.use(session)
-}
-else if (process.env.SESSION_TYPE == "redis") {
-	logger.info(`Using Redis sessioning`)
-	session = require('express-session')
-	const redisStore = require('connect-redis')(session);
-	let sessionParams = {
-		secret: process.env.SESSION_SECRET,
-		name: process.env.SESSION_NAME,
-		resave: true,
-		saveUninitialized: true,
-		cookie: { secure: false }, // Note that the cookie-parser module is no longer needed
-		store: new redisStore({ host: 'localhost', port: 6379, client: redisClient, ttl: 86400 }),
-	}
-	session = require('express-session')(sessionParams)
-
-	redisClient.on('error', (err) => {
-		console.log('Redis error: ', err);
+		maxAge: process.env.SESSION_TTL,
+		//secure: true
 	});
-
-	app.use(session)
+	app.use(session);
 }
 else {
 	logger.info(`Using Express sessioning`)
 	session = require('express-session')({
+		name: process.env.SESSION_NAME,
 		secret: process.env.SESSION_SECRET,
 		resave: true,
 		saveUninitialized: true
@@ -135,7 +116,6 @@ app.use('/blog', blogRoutes);
 app.use('/editor', editorRoutes)
 
 /* Perform other initialziations *********************************************/
-const editorCtrl = require('./components/editor/editor-controller');
 
 /* Launch the listeners ******************************************************/
 // catch 404 and forward to error handler
