@@ -11,8 +11,8 @@ const mongoSantiize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 
 /* Setup dependencies ********************************************************/
-const logger = require('./utils/logger').logger
-const httpLogger = require('./utils/logger').httpLogger
+const {logger , httpLogger, getOutputType} = require('./utils/logger')
+
 logger.info(`Running server in a '${process.env.NODE_ENV}' environment`);
 
 const requiredEnvVars = ['PORT', 'DB_TYPE', 'DB_IP', 'DB_PORT', 'DB_NAME',
@@ -67,6 +67,7 @@ let limiter = rateLimit({
 	windowMs: 10 * 60 * 1000,
 	max: 100
 });
+
 app.use(limiter);
 
 /* Setup Sessioning **********************************************************/

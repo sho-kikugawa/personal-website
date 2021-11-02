@@ -2,9 +2,10 @@
  * Creates a new logger instance using Winston.
  */
 
-const { createLogger, format, transports } = require('winston')
-const { combine, timestamp, colorize, splat, printf } = format
-
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, colorize, splat, printf } = format;
+const path = require('path');
+require('winston-daily-rotate-file');
 
 /**
  * Get the environment this module is running under.
@@ -22,13 +23,15 @@ function getEnvironment() {
 function getOutputType(logName) {
 	if (process.env.LOG_OUTPUT === 'logfile') {
 		return [
-			new transports.File({
-				filename: `${logName}-combined.log`,
+			new transports.DailyRotateFile({
+				datePattern: 'YYYY-MM-DD_HH-mm',
+				filename: path.join(process.env.LOG_PATH, `${logName}-combined.log`),
 				level: 'info',
 				timestamp: true
 			}),
-			new transports.File({
-				filename: `${logName}-errors.log`,
+			new transports.DailyRotateFile({
+				filename: path.join(process.env.LOG_PATH, `${logName}-errors.log`),
+				datePattern: 'YYYY-MM-DD_HH-mm',
 				level: 'error',
 				timestamp: true
 		})]

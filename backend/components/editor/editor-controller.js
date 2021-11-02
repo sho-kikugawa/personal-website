@@ -71,7 +71,7 @@ async function postEditorLogin(req, res) {
 			res.cookie(process.env.SESSION_NAME, 'value', {
 				account: editorData.editorId
 			});
-			req.session.account = editorData.editorId;
+			req.session.sessionID = editorData.editorId;
 			req.session.save();
 			logger.debug(`Creating session for ${editorData.editorId}`);
 			logger.debug(`Session: ${formatJson(req.session)}`);
@@ -105,23 +105,32 @@ async function postEditBlog(req, res) {
 		});
 	}
 	else {
-		let updatedBlog = {
+		const updatedBlog = {
 			internalTitle: urlTitle,
 			title: req.body.title,
 			subtitle: req.body.subtitle,
 			content: req.body.content
 		}
-		let updateResult = await blogService.updateBlog(req.query.title, updatedBlog);
+		const updateResult = await blogService.updateBlog(req.query.title, updatedBlog);
+		let resultText;
 		logger.debug(`Update result: ${formatJson(updateResult)}`);
+
+		if (updateResult.modifiedCount === 1) {
+			resultText = "Blog successfully updated!";
+		}
+		else {
+			resultText = `Blog was not updated: ${formatJson(updateResult)}`;
+		}
 		res.render('editor/editing-result', 
 			{
 				title: "Editing blog result",
-				result: formatJson(updateResult)
+				result: resultText
 			});
 	}
 }
 
 async function postDeleteBlog (req, res) {
+	logger.debug(`Deleting a blog: ${formatJson(req.query.title)}`);
 	if (("title" in req.query) && await blogService.getIfBlogExists(req.query.title) === false) {
 		res.render('editor/editing-result', {
 			title: "Delete failed",
@@ -129,13 +138,21 @@ async function postDeleteBlog (req, res) {
 		});
 	}
 	else {
-		logger.debug(`Deleting a blog: ${formatJson(req.query.title)}`);
-		let deteleResult = await blogService.deleteBlog(req.query.title);
-		logger.debug(`Deletion result: ${formatJson(deteleResult)}`);
+		const deleteResult = await blogService.deleteBlog(req.query.title);
+		let result;
+		logger.debug(`Deletion result: ${formatJson(deleteResult)}`);
+
+		if(deleteResult.deletedCount === 1) {
+			result = "Successfully deleted the blog!";
+		}
+		else {
+			result = `The blog wasn't deleted: ${formatJson(deleteResult)}`;
+		}
+
 		res.render('editor/editing-result', 
 			{
 				title: "Deleting blog result",
-				result: `Result: ${formatJson(deteleResult)}`
+				result: result
 			});
 	}
 }
