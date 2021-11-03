@@ -79,7 +79,7 @@ if (process.env.SESSION_TYPE == "cookie") {
 		name: process.env.SESSION_NAME,
 		secret: process.env.SESSION_SECRET,
 		maxAge: process.env.SESSION_TTL,
-		//secure: true
+		secure: true
 	});
 	app.use(session);
 }
@@ -88,7 +88,11 @@ else {
 	session = require('express-session')({
 		name: process.env.SESSION_NAME,
 		secret: process.env.SESSION_SECRET,
-		resave: true,
+		resave: false,
+		cookie: { 
+			maxAge: 1000 * 60 * 5,
+			secure: true,
+		},
 		saveUninitialized: true
 	})
 	app.use(session)
@@ -146,7 +150,9 @@ app.use(function (err, req, res, next) {
 	// render the error page
 	res.status(err.status || 500)
 	res.render('error', {
-		title: 'Website error'
+		title: 'Website error',
+		message: res.locals.message,
+		error: res.locals.error
 	})
 })
 

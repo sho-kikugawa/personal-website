@@ -5,26 +5,26 @@
 	- [x] Blog URLs look "normal", rather than using a query (e.g. ```something.com/page/article``` rather than  ```something.com/page?key=article```)
 	- [X] Limit how many blog appear on the listing
 	- [X] Have a way to navigate through blog listings
-- [ ] Pushing content while site is live
-	- [x] Separate URL for logging in
-	- [x] Ability to log out
+- [ ] Sessioning Support
 	- [x] Sessioning support
+	- [x] Ability to log out
+	- [X] Editors have a unique ID
+	- [ ] Use another session store (connect-mongo to avoid needing another DB)
+- [X] Pushing content while site is live
 	- [x] Client behvaior changes if logged in (e.g., extra buttons somewhere)
 	- [x] Articles can be updated
-	- [X] Editors have a unique ID
-	- [X] Only allowed unique IDs are accepted
+	- [x] Separate URL for logging in
 - [ ] Security
-	- [ ] Sanitize input strings!
+	- [X] Sanitize input strings!
 		- [X] Sanitize blog contents
-		- [ ] Sanitize URL (?)
+		- [X] Sanitize URL
 	- [ ] Must support HTTPS
 		- [X] Works with self-signed cert
 		- [ ] Works with a cert from a CA
 	- [X] - Harden sessioning tokens
 - [ ] Reliability
-	- [ ] Work with another web server (Node.js by itself may be iffy)
-	- [ ] Evaluate how to handle errors
-	- [ ] Logging to a file
+	- [X] Evaluate how to handle errors 
+	- [X] Logging to a file
 	- [ ] Find a "keep-alive" monitor like nodemon
 
 # Nice to have
@@ -37,3 +37,5 @@
 	- [ ] By tags
 	- [ ] Sanitize search inputs (when implemented)
 - [ ] Find a WYSIWYG markdown editor
+- [ ] Reliability
+	- [ ] Work with another web server (Node.js by itself may be iffy)

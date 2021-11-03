@@ -21,24 +21,23 @@ function getEnvironment() {
 }
 
 function getOutputType(logName) {
+	let outputs = [];
 	if (process.env.LOG_OUTPUT === 'logfile') {
-		return [
-			new transports.DailyRotateFile({
-				datePattern: 'YYYY-MM-DD_HH-mm',
-				filename: path.join(process.env.LOG_PATH, `${logName}-combined.log`),
-				level: 'info',
-				timestamp: true
-			}),
-			new transports.DailyRotateFile({
-				filename: path.join(process.env.LOG_PATH, `${logName}-errors.log`),
-				datePattern: 'YYYY-MM-DD_HH-mm',
-				level: 'error',
-				timestamp: true
-		})]
+		outputs.push(new transports.DailyRotateFile({
+			datePattern: 'YYYY-MM-DD_HH-mm',
+			filename: path.join(process.env.LOG_PATH, `${logName}-combined.log`),
+			level: 'debug',
+			timestamp: true
+		}));
+		outputs.push(new transports.DailyRotateFile({
+			filename: path.join(process.env.LOG_PATH, `${logName}-errors.log`),
+			datePattern: 'YYYY-MM-DD_HH-mm',
+			level: 'error',
+			timestamp: true
+		}));
 	}
-	else {
-		return [new transports.Console()]
-	}
+	outputs.push(new transports.Console());
+	return outputs;
 }
 
 let logger = createLogger({
