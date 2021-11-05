@@ -69,11 +69,11 @@ async function postEditorLogin(req, res) {
 			logger.info(`Editor ${editorData.username} logged in`);
 			logger.debug(`Editor data from login: ${formatJson(editorData)}`);
 			res.cookie(process.env.SESSION_NAME, 'value', {
-				account: editorData.editorId
-			});
-			req.session.sessionID = editorData.editorId;
+				editor: editorData.editorId
+			})
+			req.session.editor = editorData.editorId;
 			req.session.save();
-			logger.debug(`Creating session for ${editorData.editorId}`);
+
 			logger.debug(`Session: ${formatJson(req.session)}`);
 			res.render('editor/response', {
 				title: `Editor Login`, 
@@ -90,8 +90,12 @@ async function postEditorLogin(req, res) {
 }
 
 async function postEditorLogout (req, res) {
-	req.session = null;
-	res.redirect('/');
+	req.session.destroy((err) => {
+        if(err){
+            logger.error(err);
+        } 
+		res.redirect('/');
+    });
 }
 
 async function postEditBlog(req, res) {

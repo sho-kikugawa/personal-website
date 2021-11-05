@@ -26,7 +26,7 @@ async function getBlog(req, res) {
 		res.render('blog/blog', {
 			title: blogData.title,
 			data: blogData,
-			loggedIn: ('sessionID' in req.session)
+			loggedIn: ('editor' in req.session)
 		});
 	}
 }
@@ -42,7 +42,7 @@ async function getBlogList(req, res) {
 		res.render('blog/list', 
 			{	currentPage: -1, 
 				title: "Blog list", 
-				loggedIn: ('sessionID' in req.session)
+				loggedIn: ('editor' in req.session)
 			});
 	}
 	else {
@@ -80,7 +80,7 @@ async function getBlogList(req, res) {
 				title: "Blog list", 
 				currentPage: pageNum,
 				lastPage: (blogPages === pageNum),
-				loggedIn: ('sessionID' in req.session)
+				loggedIn: ('editor' in req.session)
 			});
 	}
 }
@@ -93,9 +93,9 @@ async function postFindBlogs(req, res) {
 	res.render('blog/list', 
 		{
 			blogs: blogData, 
-			title: `Searched forloggedIn: ('sessionID' in req.session) "${req.body.searchTerm}"`, 
+			title: `Searched forloggedIn: ('editor' in req.session) "${req.body.searchTerm}"`, 
 			searchBar: false,
-			loggedIn: ('sessionID' in req.session)
+			loggedIn: ('editor' in req.session)
 		});
 }
 

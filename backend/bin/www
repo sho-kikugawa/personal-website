@@ -4,11 +4,11 @@
  * Module dependencies.
  */
 
-let app = require('../app').app;
 let debug = require('debug');
 let fs = require('fs');
 let http = require('http');
 let https = require('https');
+let { app } = require('../app');
 const logger = require('../utils/logger').logger
 /**
  * Get port from environment and store in Express.
@@ -30,9 +30,8 @@ try {
 			cert: fs.readFileSync(certFilename)
 		};
 		let server = https.createServer(options, app);
-		logger.info('Starting https server at port ' + securePort)
-
-		logger.info('Starting http server at port ' + securePort)
+		logger.info('Starting https server at port ' + securePort);
+		logger.info('Starting http server at port ' + openPort);
 		server.listen(securePort, () => {
 			logger.info('server started.');
 			onListening(server);
@@ -61,7 +60,7 @@ try {
 			logger.info('server started.')
 			onListening(server);
 		});
-		server.on('error', (error) => {onError(error, securePort)});
+		server.on('error', (error) => {onError(error, openPort)});
 	}
 }
 catch (err) {

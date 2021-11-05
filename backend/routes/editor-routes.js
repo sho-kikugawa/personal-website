@@ -10,7 +10,7 @@ const { handler }= require('./router-utils');
 
 /* GET routers ***************************************************************/
 router.get('/create', (req, res) => {
-	if ('sessionID' in req.session) {
+	if ('editor' in req.session) {
 		res.render('editor/create-blog', {title: "Create a blog"});
 	}
 	else {

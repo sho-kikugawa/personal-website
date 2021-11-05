@@ -5,11 +5,14 @@
 	- [x] Blog URLs look "normal", rather than using a query (e.g. ```something.com/page/article``` rather than  ```something.com/page?key=article```)
 	- [X] Limit how many blog appear on the listing
 	- [X] Have a way to navigate through blog listings
-- [ ] Sessioning Support
-	- [x] Sessioning support
+- [X] Sessioning Support
+	- [x] Sessioning support 
 	- [x] Ability to log out
+	- [X] Use another session store (consider redis)
+	- [X] Sessions must time out
+- [X] Editor administration
+	- [X] Editor management not online
 	- [X] Editors have a unique ID
-	- [ ] Use another session store (connect-mongo to avoid needing another DB)
 - [X] Pushing content while site is live
 	- [x] Client behvaior changes if logged in (e.g., extra buttons somewhere)
 	- [x] Articles can be updated
@@ -26,16 +29,30 @@
 	- [X] Evaluate how to handle errors 
 	- [X] Logging to a file
 	- [ ] Find a "keep-alive" monitor like nodemon
+- [ ] Cleanup
+	- [ ] Start trimming things that are not actually needed
 
 # Nice to have
-- [ ] Visitor count
-- [ ] Article view count
-- [ ] Editors can upload images while server is live
+- [ ] Showing articles
+	- [ ] Visitor count
+	- [ ] Article view count
 - [ ] Support for blog searching
 	- [ ] By title
 	- [ ] By subtitle/summary
 	- [ ] By tags
 	- [ ] Sanitize search inputs (when implemented)
-- [ ] Find a WYSIWYG markdown editor
+- [ ] Editor administration
+	- [ ] Capability system for editors (basic, corresponds to CRUD ops)
+	- [ ] Editor ownership (which editors can update/change which articles)
+	- [ ] Update tools to make it more of a stand-alone thing
+- [ ] Pushing content while site is live
+	- [ ] Support a publish time (article goes live at specific time)
+	- [ ] Find a WYSIWYG markdown editor
+	- [ ] Editors can upload images while server is live
+	- [ ] Can preview articles before committing to DB
 - [ ] Reliability
 	- [ ] Work with another web server (Node.js by itself may be iffy)
+
+# Maybe in the future...
+- [ ] Release this as a thing!
+- [ ] Convert this into a TypeScrpt project

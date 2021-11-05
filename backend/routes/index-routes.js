@@ -10,14 +10,14 @@ const { handler } = require('./router-utils');
 router.get('/', (req, res) => {
 	res.render('index', {
 		title: "Home", 
-		loggedIn: ('sessionID' in req.session),
+		loggedIn: ('editor' in req.session),
 	});
 })
 
 router.get('/about', (req, res) => {
 	res.render('about', {
 		title: "About",
-		loggedIn: ('sessionID' in req.session)
+		loggedIn: ('editor' in req.session)
 	});
 })
 
