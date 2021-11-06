@@ -10,7 +10,6 @@ const requiredEnvs = [
 
 	'SESSION_NAME', 
 	'SESSION_SECRET', 
-	'SESSION_TTL' 
 ];
 
 /* Environment variables required in production */
@@ -24,6 +23,7 @@ const productionEnvs = [
 	'TLS_KEY_FILENAME',	
 	'DB_USERNAME', 
 	'DB_PASSWORD',
+	'SESSION_TTL',
 	'SESSION_DB_IP',
 	'SESSION_DB_PORT'
 ]

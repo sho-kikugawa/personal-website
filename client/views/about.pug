@@ -1,43 +1,41 @@
 extends common/layout
 block content
-	div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
-	div.mdl-cell.mdl-cell--8-col
-		div.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
-			h4 About this site
-			p 
-			| For the longest time I didn't consider making a personal website, but a
-			| friend inspired me to make one. On top of that, with some experience 
-			| working with a MEAN stack for side project, I thought I could leverage
-			| those skills to make this website.
-			p
-			| What you're seeing is something I think is easily digestable project to 
-			| tackle using a MEAN stack. Which does indeed mean: 
-			ul 
-				li It runs on a Node.js + Express backend 
-				li 
-					| It uses MongoDB to store blog articles and retrieve them, so I  
-					| don't have to create a new page every time I want to create an 
-					| article.
-				li 
-					| The only part of the MEAN stack it doesn't use is the "A", as this 
-					| website doesn't need a frontend framework as feature rich as Angular,
-					| React, or others.
-			p The source code for this website can be found on 
-				a(href="https://www.github.com/sho-kikugawa/personal-website") my GitHub
-		div.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
-			h4 Legal stuff
-			p Unless specified otherwise in the content itself:
-			img(src="img/640px-CC-BY_icon.svg.png", height="64px", alt="CC-BY license")
-			br
-			br
-			code All original content on this website (c) by Sho Kikugawa
-			br
-			br
-			code All original content on this website is licensed under a 
-				| Creative Commons Attribution 3.0 Unported License.
-			br
-			br
-			code You should have received a copy of the license along with this 
-				| work.  If not, see 
-				a(href="http://creativecommons.org/licenses/by/3.0/") 
-					| http://creativecommons.org/licenses/by/3.0/.
+	div.bg-light.p-5.rounded
+		h4 About this site
+		p 
+		| For the longest time I didn't consider making a personal website, but a
+		| friend inspired me to make one. On top of that, with some experience 
+		| working with a MEAN stack for side project, I thought I could leverage
+		| those skills to make this website.
+		p
+		| What you're seeing is something I think is easily digestable project to 
+		| tackle using a MEAN stack. Which does indeed mean: 
+		ul 
+			li It runs on a Node.js + Express backend 
+			li 
+				| It uses MongoDB to store blog articles and retrieve them, so I  
+				| don't have to create a new page every time I want to create an 
+				| article.
+			li 
+				| The only part of the MEAN stack it doesn't use is the "A", as this 
+				| website doesn't need a frontend framework as feature rich as Angular,
+				| React, or others.
+		p The source code for this website can be found on 
+			a(href="https://www.github.com/sho-kikugawa/personal-website") my GitHub
+	div.bg-light.p-5.rounded(style="margin-top: 2em;")
+		h4 Legal stuff
+		p Unless specified otherwise in the content itself:
+		img(src="img/640px-CC-BY_icon.svg.png", height="64px", alt="CC-BY license")
+		br
+		br
+		code All original content on this website (c) by Sho Kikugawa
+		br
+		br
+		code All original content on this website is licensed under a 
+			| Creative Commons Attribution 3.0 Unported License.
+		br
+		br
+		code You should have received a copy of the license along with this 
+			| work.  If not, see 
+			a(href="http://creativecommons.org/licenses/by/3.0/") 
+				| http://creativecommons.org/licenses/by/3.0/.

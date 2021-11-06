@@ -11,14 +11,25 @@ const { handler }= require('./router-utils');
 /* GET routers ***************************************************************/
 router.get('/create', (req, res) => {
 	if ('editor' in req.session) {
-		res.render('editor/create-blog', {title: "Create a blog"});
+		res.render('editor/publish', {
+			title: "Create a blog",
+			data: {
+				title: "",
+				subtitle: "",
+				content: ""
+			},
+			newArticle: true
+		});
 	}
 	else {
-		res.status(404).render('404', {title: 'Page not found'});
+		res.status(404).render('404', {
+			title: 'Page not found'
+		});
 	}
 });
 
-router.get('/edit', (req, res, next) => {
+// Pages in the list are accessed with /blogs/page/#
+router.get('/edit/*', (req, res, next) => {
 	handler(getEditBlog, req, res, next);
 });
 
@@ -35,11 +46,7 @@ router.post('/logout', (req, res, next) => {
 	handler(postEditorLogout, req, res, next);
 });
 
-router.post('/create', (req, res, next) => {
-	handler(postCreateBlog, req, res, next);
-});
-
-router.post('/edit', (req, res, next) => {
+router.post('/publish', (req, res, next) => {
 	handler(postEditBlog, req, res, next);
 });
 

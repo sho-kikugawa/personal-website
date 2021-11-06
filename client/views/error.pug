@@ -1,8 +1,7 @@
 extends common/layout
 block content
-	div.mdl-cell.mdl-cell--12-col
-		div.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
-			h3= message
-			p= error.status
-			div(style="max-width: 1440px; overflow: auto;")
-				pre #{error.stack}
+	div.bg-light.p-5
+		h3= message
+		p= error.status
+		div(style="max-width: 1440px; overflow: auto;")
+			pre #{error.stack}
