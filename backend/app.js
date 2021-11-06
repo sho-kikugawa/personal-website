@@ -147,6 +147,7 @@ app.use('/editor', editorRoutes)
 
 /* Launch the listeners ******************************************************/
 const createError = require('http-errors');
+const { RenderData } = require('./routes/router-utils');
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
 	res.status(404);
@@ -154,7 +155,6 @@ app.use(function (req, res, next) {
 		next(createError(404));
 	}
 	else {
-		const { RenderData } = require('./routes/router-utils');
 		const data = new RenderData('Page not found', req)
 		next(res.render('404', data));
 	}
@@ -175,11 +175,10 @@ app.use(function (err, req, res, next) {
 
 	// render the error page
 	res.status(err.status || 500)
-	res.render('error', {
-		title: 'Website error',
-		message: res.locals.message,
-		error: res.locals.error
-	})
+	let data = new RenderData('Website error', req);
+	data.message = res.locals.message;
+	data.error = res.locals.error;
+	res.render('error', data);
 })
 
 module.exports = {

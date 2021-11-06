@@ -54,10 +54,9 @@ async function postCreateBlog(req, res) {
 
 async function postEditorLogin(req, res) {
 	if (!req.body.editorUsername || !req.body.editorPassword) {
-		res.render('editor/response', {
-			title: `Editor Login`, 
-			message: `No username or password given`
-		});
+		let data = new RenderData('Login error', req);
+		data.message = `No username or password given`;
+		res.render('editor/response', data);
 	}
 	else {
 		let editorData = await editorService.editorLogin(
@@ -74,16 +73,14 @@ async function postEditorLogin(req, res) {
 			req.session.save();
 
 			logger.debug(`Session: ${formatJson(req.session)}`);
-			res.render('editor/response', {
-				title: `Editor Login`, 
-				message: `Login successful!`
-			});
+			let data = new RenderData('Login success', req);
+			data.message = `You're logged in!`;
+			res.render('editor/response', data);
 		}
 		else {
-			res.render('editor/response', {
-				title: `Editor Login`, 
-				message: `Invalid login`
-			});
+			let data = new RenderData('Login error', req);
+			data.message = `Username or passsword is incorrect`;
+			res.render('editor/response', data);
 		}
 	}
 }
