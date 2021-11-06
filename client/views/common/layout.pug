@@ -3,8 +3,10 @@ html
 	head
 		include ./head.pug
 	body
-		div.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-			include ./navbar.pug
-			main.mdl-layout__content.common-main
-				div.mdl-grid.common-grid
+		include ./navbar.pug
+		main.container.common-main
+			div.row
+				div.col
+				div.col-lg-8
 					block content
+				div.col

@@ -1,9 +1,5 @@
-table {
-	max-width: 1280px;
-}
-
-td {
-	overflow: hidden;
+.table thead > tr > th {
+	border-bottom: 2px solid black;
 }
 
 td:nth-child(1) {

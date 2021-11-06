@@ -1,26 +1,33 @@
-table.mdl-data-table.mdl-shadow--2dp
+if loggedIn == true
+	div.mb-3(style="text-align: right;")
+		a.btn.btn-primary(href=`/editor/create`) Create new blog
+
+table.table.table-bordered
 	thead 
-		tr 
-			td.mdl-data-table__cell--non-numeric Title
-			td.mdl-data-table__cell--non-numeric Summary
-			td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone Date posted
+		tr.table-secondary.table-bordered 
+			th(scope="col") Title
+			th(scope="col") Summary
+			th(scope="col") Date posted
+			if loggedIn == true
+				th(scope="col") Admin
+				th(scope="col") 
 	tbody 
 	each blog in blogs
 		tr 
-			td.mdl-data-table__cell--non-numeric 
+			td
 				a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
-			td.mdl-data-table__cell--non-numeric #{blog.subtitle} 
-			td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone #{blog.dateString}
+			td #{blog.subtitle} 
+			td #{blog.dateString}
 			if loggedIn == true
-				td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone 
-					a(href=`editor/edit?title=${blog.internalTitle}`) Edit
-				td.mdl-data-table__cell--non-numeric.mdl-cell--hide-phone
-					form(action=`/editor/delete?title=${blog.internalTitle}`, method="post")
-						button Delete
+				td 
+					a.btn.btn-link(href=`editor/edit/${blog.internalTitle}`) Edit
+				td
+					form(action=`/editor/delete/${blog.internalTitle}`, method="post")
+						button.btn.btn-link Delete
 div.blog-list-nav
 	- if (currentPage === 2) 
-		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs`) Previous Page
+		a.btn.btn-secondary(href=`/blogs`) Previous Page
 	- else if (currentPage > 2)
-		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage-1}`) Previous Page
+		a.btn.btn-secondary(href=`/blogs/page/${currentPage-1}`) Previous Page
 	- if (lastPage === false) 
-		a.mdl-button.mdl-js-button.mdl-button--raised.mdl-button--colored(href=`/blogs/page/${currentPage+1}` style="float:right;") Next Page
+		a.btn.btn-secondary(href=`/blogs/page/${currentPage+1}` style="float:right;") Next Page

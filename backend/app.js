@@ -45,26 +45,29 @@ app.use(xssClean());
 app.use(hpp());
 app.use(mongoSantiize());
 
-let limitMs = 10 * 60 * 1000; // 10 minutes
-let maxReq = 100;
+if(process.env.NODE_ENV === `production`) {
+	let limitMs = 10 * 60 * 1000; // 10 minutes
+	let maxReq = 100;
 
-if (isEnvDefined('RATE_LIMIT_MS') === true) {
-	const envVal = parseInt(process.env.RATE_LIMIT_MS);
-	limitMs = (isNaN(envVal)) ? limitMs : envVal;
+	if (isEnvDefined('RATE_LIMIT_MS') === true) {
+		const envVal = parseInt(process.env.RATE_LIMIT_MS);
+		limitMs = (isNaN(envVal)) ? limitMs : envVal;
+	}
+	if (isEnvDefined('RATE_MAX_REQS') === true) {
+		const envVal = parseInt(process.env.RATE_MAX_REQS);
+		maxReq = (isNaN(envVal)) ? maxReq : envVal;
+	}
+
+	const  limiter = rateLimit({
+		windowMs: limitMs,
+		max: maxReq
+	});
+
+	logger.debug(`Rate limit time: ${limitMs}ms`);
+	logger.debug(`Request limit: ${maxReq}`);
+	app.use(limiter);
 }
-if (isEnvDefined('RATE_MAX_REQS') === true) {
-	const envVal = parseInt(process.env.RATE_MAX_REQS);
-	maxReq = (isNaN(envVal)) ? maxReq : envVal;
-}
 
-const  limiter = rateLimit({
-	windowMs: limitMs,
-	max: maxReq
-});
-
-logger.debug(`Rate limit time: ${limitMs}ms`);
-logger.debug(`Request limit: ${maxReq}`);
-app.use(limiter);
 	
 /* Setup Middleware **********************************************************/
 const path = require('path');
@@ -133,9 +136,11 @@ else {
 /* Setup Routes **************************************************************/
 const indexRoutes = require('./routes/index-routes');
 const blogRoutes = require('./routes/blog-routes');
+const blogsRoutes = require('./routes/blogs-routes');
 const editorRoutes = require('./routes/editor-routes');
 app.use('/', indexRoutes);
 app.use('/blog', blogRoutes);
+app.use('/blogs', blogsRoutes);
 app.use('/editor', editorRoutes)
 
 /* Perform other initialziations *********************************************/

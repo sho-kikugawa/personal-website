@@ -4,14 +4,13 @@ html
 		include ../common/head.pug
 		link(rel='stylesheet', href='/css/blog-list.css')
 	body
-		div.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-			include ../common/navbar.pug
-			main.mdl-layout__content.common-main
-				div.mdl-grid.common-grid
-					div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
-					- if(currentPage === -1)
-						div.mdl-cell.mdl-cell--8-col.mdl-cell--4-col-phone.mdl-shadow--4dp.common-content
-							p No blogs posted yet!
-					- else 
-						div.mdl-cell.mdl-cell--8-col.mdl-cell--4-col-phone.common-content
-							include list-table.pug
+		include ../common/navbar.pug
+		main.container.common-main
+			div.row
+				div.col
+				div.col-lg-8
+						- if(currentPage === -1)
+								p No blogs posted yet!
+						- else 
+								include list-table.pug
+				div.col

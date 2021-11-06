@@ -1,13 +1,11 @@
 extends ../common/layout
 block content
-	div.mdl-cell.mdl-cell--2-col.mdl-cell--hide-tablet.mdl-cell--hide-phone
-	div.mdl-cell.mdl-cell--8-col
-		div.mdl-color--white.mdl-shadow--4dp.mdl-color-text--grey-800.common-content
-			form(action="login", method="post")
-				label.common-label(style="width: 100px;") Username
-				input.common-input(type="text", name="editorUsername", placeholder="Enter a title")
-				br
-				label.common-label(style="width: 100px;") Password
-				input.common-input(type="text", name="editorPassword", placeholder="Enter a summary")
-				br
-				button Login
+	div.bg-light.p-5.rounded
+		form(action="login", method="post")
+			div.mb-3
+				label.form-label Username
+				input.form-control(type="text", name="editorUsername")
+			div.mb-3
+				label.form-label(style="width: 100px;") Password
+				input.form-control(type="password", name="editorPassword")
+			button.btn.btn-primary Login
