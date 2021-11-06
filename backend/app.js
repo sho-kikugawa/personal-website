@@ -154,7 +154,9 @@ app.use(function (req, res, next) {
 		next(createError(404));
 	}
 	else {
-		next(res.render('404', {title: 'Page not found'}));
+		const { RenderData } = require('./routes/router-utils');
+		const data = new RenderData('Page not found', req)
+		next(res.render('404', data));
 	}
 })
 

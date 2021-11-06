@@ -104,6 +104,6 @@ dist
 .tern-port
 
 # Other files
-backend/package-lock.json
+**/package-lock.json
 backend/certs
 client/public/img/*

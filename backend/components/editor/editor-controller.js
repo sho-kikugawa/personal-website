@@ -1,21 +1,16 @@
 const sanitizer = require('sanitize-html');
-const { logger, formatJson } = require("../../utils/logger");
 const blogService = require('../blog/blog-service');
 const editorService = require('./editor-service');
+const { logger, formatJson } = require("../../utils/logger");
+const { RenderData } = require('../../routes/router-utils');
 
 const TITLE_REGEX = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 
-let accessList = [];
-
-function setupAccessList(path) {
-	const fs = require('fs');
-	fs.readFile(path, 'utf8', function (err,data) {
-		if (err) {
-		  return logger.error(err);
-		}
-		accessList = data.split('\n');
-		logger.debug(`Account access list: ${accessList}`);
-	});
+async function getCreateBlog(req, res) {
+	let data = new RenderData('Create a blog', req);
+	data.data = {title: "", subtitle: "", content: "" };
+	data.newArticle = true;
+	res.render('editor/publish', data);
 }
 
 async function getEditBlog(req, res) {
@@ -23,41 +18,37 @@ async function getEditBlog(req, res) {
 	let internalTitle = req.originalUrl.substring(basePath.length);
 
 	if (await blogService.getIfBlogExists(internalTitle) === false)  {
-		res.render('editor/response', {
-			title: "Edit failed",
-			message: "This blog does not exist :<"
-		});
+		let data = new RenderData('Edit blog error', req);
+		data.message = `This blog does not exist :<`;
+		res.render('editor/response', data);
 	}
 	else {
 		let blogData = await blogService.getBlog(internalTitle);
-		res.render('editor/publish', 
-			{
-				title: `Editing: ${blogData.title}`,
-				data: blogData
-		});
+		let data = new RenderData(`Editing: ${blogData.title}`, req);
+		data.blogData = blogData;
+		res.render('editor/publish', data);
 	}
 }
 
 async function postCreateBlog(req, res) {
-	const urlTitle = req.body.blogTitle.replace(TITLE_REGEX, '').replaceAll(' ', '-').toLowerCase();
+	const urlTitle = req.body.title.replace(TITLE_REGEX, '').replaceAll(' ', '-').toLowerCase();
 	logger.debug(`Creating a blog: ${formatJson(req.body)}`);
 
 	if (await blogService.getIfBlogExists(urlTitle) === true) {
-		res.render('editor/response', {
-			title: "Edit failed",
-			message: "A blog with this title already exists :<"
-		})
+		let data = new RenderData('Create blog error', req);
+		data.message = `A blog with this title already exists :<`;
+		res.render('editor/response', data);
 	}
 	else {
 		let blogData = await blogService.createBlog(
 			urlTitle, 
-			sanitizer(req.body.blogTitle),
-			sanitizer(req.body.blogSubtitle),
+			sanitizer(req.body.title),
+			sanitizer(req.body.subtitle),
 			
 			// This will get sanitized on display
-			req.body.blogContent);
+			req.body.content);
 		logger.debug(`blogData if created: ${formatJson(blogData)}`);
-		res.render('editor/response', {message: `Blog posted!`});
+		res.redirect(`/blog/article/${urlTitle}`);
 	}
 }
 
@@ -111,10 +102,9 @@ async function postEditBlog(req, res) {
 	logger.debug(`Editing a blog: ${formatJson(req.body)}`);
 
 	if (await blogService.getIfBlogExists(urlTitle) === false) {
-		res.render('editor/response', {
-			title: "Edit failed",
-			message: "This blog does not exist :<"
-		});
+		let data = new RenderData('Edit blog error', req);
+		data.message = `This blog does not exist :<`;
+		res.render('editor/response', data);
 	}
 	else {
 		const updatedBlog = {
@@ -123,54 +113,47 @@ async function postEditBlog(req, res) {
 			subtitle: req.body.subtitle,
 			content: req.body.content
 		}
-		const updateResult = await blogService.updateBlog(req.query.title, updatedBlog);
-		let resultText;
+		const updateResult = await blogService.updateBlog(urlTitle, updatedBlog);
 		logger.debug(`Update result: ${formatJson(updateResult)}`);
 
 		if (updateResult.modifiedCount === 1) {
-			resultText = "Blog successfully updated!";
+			res.redirect(`/blog/article/${urlTitle}`);
 		}
 		else {
-			resultText = `Blog was not updated: ${formatJson(updateResult)}`;
+			let data = new RenderData('Editing blog error', req)
+			data.message = `Blog was not updated: ${formatJson(updateResult)}`;
+			res.render('editor/response', data);
 		}
-		res.render('editor/response', 
-			{
-				title: "Editing blog result",
-				message: resultText
-			});
 	}
 }
 
 async function postDeleteBlog (req, res) {
-	logger.debug(`Deleting a blog: ${formatJson(req.query.title)}`);
-	if (("title" in req.query) && await blogService.getIfBlogExists(req.query.title) === false) {
-		res.render('editor/response', {
-			title: "Delete failed",
-			message: "This blog does not exist :<"
-		});
+	const basePath = "/editor/delete/";
+	let urlTitle = req.originalUrl.substring(basePath.length);
+
+	logger.debug(`Deleting a blog: ${formatJson(urlTitle)}`);
+	if (await blogService.getIfBlogExists(urlTitle) === false) {
+		let data = new RenderData('Deleting blog error', req);
+		data.message = `This blog does not exist :<`;
+		res.render('editor/response', data);
 	}
 	else {
-		const deleteResult = await blogService.deleteBlog(req.query.title);
-		let result;
+		const deleteResult = await blogService.deleteBlog(urlTitle);
 		logger.debug(`Deletion result: ${formatJson(deleteResult)}`);
 
 		if(deleteResult.deletedCount === 1) {
-			result = "Successfully deleted the blog!";
+			res.redirect('/blogs')
 		}
 		else {
-			result = `The blog wasn't deleted: ${formatJson(deleteResult)}`;
+			let data = new RenderData('Deleting blog error', req);
+			data.message = `The blog wasn't deleted: ${formatJson(deleteResult)}`;
+			res.render('editor/response', data);
 		}
-
-		res.render('editor/response', 
-			{
-				title: "Deleting blog result",
-				message: result
-			});
 	}
 }
 
 module.exports = {
-	setupAccessList,
+	getCreateBlog,
 	getEditBlog,
 	postEditorLogin,
 	postEditorLogout,

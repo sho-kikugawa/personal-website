@@ -1,14 +1,16 @@
 const marked = require('marked');
 const sanitizer = require('sanitize-html');
-const { logger, formatJson } = require("../../utils/logger");
+const createError = require('http-errors');
 const blogService = require(`./blog-service`);
+const { logger, formatJson } = require("../../utils/logger");
+const { RenderData } = require('../../routes/router-utils');
 
-async function getBlog(req, res) {
+async function getBlog(req, res, next) {
 	const basePath = "/blog/article/";
 	let internalTitle = req.originalUrl.substring(basePath.length);
 
 	if (await blogService.getIfBlogExists(internalTitle) === false)  {
-		res.status(404).render('404', {title: 'Page not found'});
+		next(createError(404));
 	}
 	else {
 		let blogData = await blogService.getBlog(internalTitle);
@@ -23,11 +25,9 @@ async function getBlog(req, res) {
 				title: "There's no blog here :<",
 				content: "No really, there isn't."};
 		}
-		res.render('blog/blog', {
-			title: blogData.title,
-			data: blogData,
-			loggedIn: ('editor' in req.session)
-		});
+		let data = new RenderData(blogData.title, req);
+		data.data = blogData
+		res.render('blog/blog', data);
 	}
 }
 
@@ -39,11 +39,9 @@ async function getBlogList(req, res) {
 	let pageNum = 1;
 
 	if (numBlogs === 0) {
-		res.render('blog/list', 
-			{	currentPage: -1, 
-				title: "Blog list", 
-				loggedIn: ('editor' in req.session)
-			});
+		let data = new RenderData("Blog list", req);
+		data.currentPage = -1;
+		res.render('blog/list', data);
 	}
 	else {
 		// Parse the page number from the URL
@@ -75,13 +73,12 @@ async function getBlogList(req, res) {
 			blogEntry.dateString = date;
 		})
 
-		res.render('blog/list', 
-			{	blogs: blogData, 
-				title: "Blog list", 
-				currentPage: pageNum,
-				lastPage: (blogPages === pageNum),
-				loggedIn: ('editor' in req.session)
-			});
+		let data = new RenderData("Blog list", req);
+		data.blogs = blogData;
+		data.currentPage = pageNum;
+		data.lastPage = (blogPages === pageNum);
+		data.loggedIn = ('editor' in req.session)
+		res.render('blog/list', data);
 	}
 }
 
@@ -90,13 +87,10 @@ async function postFindBlogs(req, res) {
 	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
 	let blogData = await blogService.findBlog(queryData);
 	logger.debug(`Blogs retrieved from search: ${JSON.stringify(blogData, null, 4)}`);
-	res.render('blog/list', 
-		{
-			blogs: blogData, 
-			title: `Searched forloggedIn: ('editor' in req.session) "${req.body.searchTerm}"`, 
-			searchBar: false,
-			loggedIn: ('editor' in req.session)
-		});
+
+	let data = new RenderData("Blog search results", req);
+	data.blogs = blogData;
+	res.render('blog/list', data);
 }
 
 module.exports = {
