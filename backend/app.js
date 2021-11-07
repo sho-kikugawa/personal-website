@@ -108,6 +108,7 @@ if (isEnvDefined('SESSION_TYPE') === true && process.env.SESSION_TYPE === 'db') 
 	const redisClient = redis.createClient();
 	logger.info(`Using Redis sessioning`);
 
+	redisClient.auth(process.env.SESSION_DB_PASSWORD);
 	app.use(expressSession({
 		secret: process.env.SESSION_SECRET,
 		store: new redisStore({ 
