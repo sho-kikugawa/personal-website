@@ -3,7 +3,7 @@ const sanitizer = require('sanitize-html');
 const createError = require('http-errors');
 const blogService = require(`./blog-service`);
 const { logger, formatJson } = require("../../utils/logger");
-const { RenderData } = require('../../routes/router-utils');
+const { RenderData, renderPage } = require('../../routes/router-utils');
 
 async function getBlog(req, res, next) {
 	const basePath = "/blog/article/";
@@ -27,7 +27,7 @@ async function getBlog(req, res, next) {
 		}
 		let data = new RenderData(blogData.title, req);
 		data.data = blogData
-		res.render('blog/blog', data);
+		renderPage('blog/blog', data, res);
 	}
 }
 
@@ -41,7 +41,7 @@ async function getBlogList(req, res) {
 	if (numBlogs === 0) {
 		let data = new RenderData("Blog list", req);
 		data.currentPage = -1;
-		res.render('blog/list', data);
+		renderPage('blog/list', data, res);
 	}
 	else {
 		// Parse the page number from the URL
@@ -78,19 +78,19 @@ async function getBlogList(req, res) {
 		data.currentPage = pageNum;
 		data.lastPage = (blogPages === pageNum);
 		data.loggedIn = ('editor' in req.session)
-		res.render('blog/list', data);
+		renderPage('blog/list', data, res);
 	}
 }
 
 async function postFindBlogs(req, res) {
 	let queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
 	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
-	let blogData = await blogService.findBlog(queryData);
+	let blogData = await blogService.findBlog(querydata, res);
 	logger.debug(`Blogs retrieved from search: ${JSON.stringify(blogData, null, 4)}`);
 
 	let data = new RenderData("Blog search results", req);
 	data.blogs = blogData;
-	res.render('blog/list', data);
+	renderPage('blog/list', data, res);
 }
 
 module.exports = {

@@ -3,17 +3,18 @@
  * 
  */
 const router = require('express').Router()
-const { RenderData } = require('./router-utils');
+const { RenderData, renderPage} = require('./router-utils');
+const { logger } = require('../utils/logger')
 
 /* GET routers****************************************************************/
 router.get('/', (req, res) => {
 	const data = new RenderData('Home', req);
-	res.render('index', data);
+	renderPage('index', data, res);
 })
 
 router.get('/about', (req, res) => {
 	const data = new RenderData('About', req);
-	res.render('about', data);
+	renderPage('about', data, res);
 })
 
 module.exports = router;

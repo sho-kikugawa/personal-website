@@ -3,14 +3,21 @@ const mongoose = require('mongoose')
 
 function initMongo(dbParameters, schemaFiles=[]){
 	mongoose.Promise = global.Promise;
-	const MONGO_DB_URI = `mongodb://${dbParameters.ipAddress}:${dbParameters.portNumber}/${dbParameters.dbName}`
-	const MONGOOSE_OPTIONS = {
+	const MONGO_DB_URI = `mongodb://${dbParameters.ipAddress}:${dbParameters.portNumber}`
+	
+	let mongooseOptions = {
+		dbName: dbParameters.dbName,
 		user: dbParameters.username,
 		pass: dbParameters.password
 	};
+
+	if (dbParameters.username && dbParameters.password) {
+		mongooseOptions.authSource = "admin";
+	}
+
 	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`)
-	logger.debug('[MongoDB] Connecting using options %o', MONGOOSE_OPTIONS)
-	mongoose.connect(MONGO_DB_URI, MONGOOSE_OPTIONS)
+	logger.debug('[MongoDB] Connecting using options %o', mongooseOptions)
+	mongoose.connect(MONGO_DB_URI, mongooseOptions)
 	mongoose.connection
 		.once('open', () => {
 			logger.info(`[MongoDB] Connected to ${MONGO_DB_URI}`)

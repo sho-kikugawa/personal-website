@@ -11,7 +11,7 @@ const {	getCreateBlog, getEditBlog, postEditorLogin, postEditorLogout,
 const { handler }= require('./router-utils');
 const { isEnvDefined } = require ('../config');
 const { logger, formatJson } = require("../utils/logger");
-const { RenderData } = require('./router-utils');
+const { RenderData, renderPage } = require('./router-utils');
 
 function editorHandler(controllerFunc, req, res, next) {
 	if ('editor' in req.session) {
@@ -34,7 +34,7 @@ router.get('/edit/*', (req, res, next) => {
 
 router.get('/login', (req, res) => {
 	const data = new RenderData('Editor login', req);
-	res.render('editor/login', data);
+	renderPage('editor/login', data, res);
 })
 
 /* POST routers **************************************************************/
@@ -76,7 +76,6 @@ router.post('/create', (req, res, next) => {
 router.post('/edit', (req, res, next) => {
 	editorHandler(postEditBlog, req, res, next);
 });
-
 
 router.post('/delete/*', (req, res, next) => {
 	editorHandler(postDeleteBlog, req, res, next);

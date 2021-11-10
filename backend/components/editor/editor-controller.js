@@ -2,7 +2,7 @@ const sanitizer = require('sanitize-html');
 const blogService = require('../blog/blog-service');
 const editorService = require('./editor-service');
 const { logger, formatJson } = require("../../utils/logger");
-const { RenderData } = require('../../routes/router-utils');
+const { RenderData, renderPage } = require('../../routes/router-utils');
 
 const TITLE_REGEX = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 
@@ -10,7 +10,7 @@ async function getCreateBlog(req, res) {
 	let data = new RenderData('Create a blog', req);
 	data.data = {title: "", subtitle: "", content: "" };
 	data.newArticle = true;
-	res.render('editor/publish', data);
+	renderPage('editor/publish', data, res);
 }
 
 async function getEditBlog(req, res) {
@@ -20,13 +20,13 @@ async function getEditBlog(req, res) {
 	if (await blogService.getIfBlogExists(internalTitle) === false)  {
 		let data = new RenderData('Edit blog error', req);
 		data.message = `This blog does not exist :<`;
-		res.render('editor/response', data);
+		renderPage('editor/response', data, res);
 	}
 	else {
 		let blogData = await blogService.getBlog(internalTitle);
 		let data = new RenderData(`Editing: ${blogData.title}`, req);
 		data.blogData = blogData;
-		res.render('editor/publish', data);
+		renderPage('editor/publish', data, res);
 	}
 }
 
@@ -37,7 +37,7 @@ async function postCreateBlog(req, res) {
 	if (await blogService.getIfBlogExists(urlTitle) === true) {
 		let data = new RenderData('Create blog error', req);
 		data.message = `A blog with this title already exists :<`;
-		res.render('editor/response', data);
+		renderPage('editor/response', data, res);
 	}
 	else {
 		let blogData = await blogService.createBlog(
@@ -56,7 +56,7 @@ async function postEditorLogin(req, res) {
 	if (!req.body.editorUsername || !req.body.editorPassword) {
 		let data = new RenderData('Login error', req);
 		data.message = `No username or password given`;
-		res.render('editor/response', data);
+		renderPage('editor/response', data, res);
 	}
 	else {
 		let editorData = await editorService.editorLogin(
@@ -75,12 +75,12 @@ async function postEditorLogin(req, res) {
 			logger.debug(`Session: ${formatJson(req.session)}`);
 			let data = new RenderData('Login success', req);
 			data.message = `You're logged in!`;
-			res.render('editor/response', data);
+			renderPage('editor/response', data, res);
 		}
 		else {
 			let data = new RenderData('Login error', req);
 			data.message = `Username or passsword is incorrect`;
-			res.render('editor/response', data);
+			renderPage('editor/response', data, res);
 		}
 	}
 }
@@ -101,7 +101,7 @@ async function postEditBlog(req, res) {
 	if (await blogService.getIfBlogExists(urlTitle) === false) {
 		let data = new RenderData('Edit blog error', req);
 		data.message = `This blog does not exist :<`;
-		res.render('editor/response', data);
+		renderPage('editor/response', data, res);
 	}
 	else {
 		const updatedBlog = {
@@ -119,7 +119,7 @@ async function postEditBlog(req, res) {
 		else {
 			let data = new RenderData('Editing blog error', req)
 			data.message = `Blog was not updated: ${formatJson(updateResult)}`;
-			res.render('editor/response', data);
+			renderPage('editor/response', data, res);
 		}
 	}
 }
@@ -132,7 +132,7 @@ async function postDeleteBlog (req, res) {
 	if (await blogService.getIfBlogExists(urlTitle) === false) {
 		let data = new RenderData('Deleting blog error', req);
 		data.message = `This blog does not exist :<`;
-		res.render('editor/response', data);
+		renderPage('editor/response', data, res);
 	}
 	else {
 		const deleteResult = await blogService.deleteBlog(urlTitle);
@@ -144,7 +144,7 @@ async function postDeleteBlog (req, res) {
 		else {
 			let data = new RenderData('Deleting blog error', req);
 			data.message = `The blog wasn't deleted: ${formatJson(deleteResult)}`;
-			res.render('editor/response', data);
+			renderPage('editor/response', data, res);
 		}
 	}
 }

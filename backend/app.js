@@ -39,8 +39,22 @@ const xssClean = require('xss-clean');
 const hpp = require('hpp');
 const mongoSantiize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
+const { generateKey } = require('./utils/crypto')
+
+app.use(function(req, res, next) {
+	res.locals.styleNonce = generateKey();
+	res.locals.scriptNonce = generateKey();
+	next()
+});
 
 app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+	useDefaults: true,
+	directives: {
+		scriptSrc: ["'self'",'strict-dynamic', function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 'unsafe-inline', 'http:', 'https:'],
+		styleSrc: ["'self'", 'strict-dynamic', function(req, res){ return `'nonce-${res.locals.styleNonce}'`}, 'unsafe-inline', 'http:', 'https:']
+	}
+}));
 app.use(xssClean());
 app.use(hpp());
 app.use(mongoSantiize());
@@ -108,6 +122,7 @@ if (isEnvDefined('SESSION_TYPE') === true && process.env.SESSION_TYPE === 'db') 
 	const redisClient = redis.createClient();
 	logger.info(`Using Redis sessioning`);
 
+	redisClient.auth(process.env.SESSION_DB_PASSWORD);
 	app.use(expressSession({
 		secret: process.env.SESSION_SECRET,
 		store: new redisStore({ 
