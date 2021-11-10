@@ -51,8 +51,22 @@ app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
 	useDefaults: true,
 	directives: {
-		scriptSrc: ["'self'",'strict-dynamic', function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 'unsafe-inline', 'http:', 'https:'],
-		styleSrc: ["'self'", 'strict-dynamic', function(req, res){ return `'nonce-${res.locals.styleNonce}'`}, 'unsafe-inline', 'http:', 'https:']
+		scriptSrc: [ 
+			"'self'",
+			'strict-dynamic', 
+			function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 
+			'unsafe-inline', 
+			'http:', 
+			'https:'
+		],
+		styleSrc: [
+			"'self'", 
+			'strict-dynamic', 
+			function(req, res){ return `'nonce-${res.locals.styleNonce}'`}, 
+			'unsafe-inline', 
+			'http:', 
+			'https:'
+		]
 	}
 }));
 app.use(xssClean());
