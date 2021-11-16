@@ -8,6 +8,7 @@ let http = require('http');
 let https = require('https');
 let { app } = require('../app');
 const logger = require('../utils/logger').logger
+const {isEnvDefined} = require('../config/config');
 
 /**
  * Get port from environment and store in Express.
@@ -22,34 +23,40 @@ let securePort = normalizePort(process.env.HTTPS_PORT || '3001');
 
 try {
 	const path = require('path');
-	const keyFilename = path.join(process.env.TLS_FILES_PATH, process.env.TLS_KEY_FILENAME);
-	const certFilename = path.join(process.env.TLS_FILES_PATH, process.env.TLS_CERT_FILENAME);
-	if (fs.existsSync(keyFilename) && fs.existsSync(certFilename)) {
-		let options = { 
-			key: fs.readFileSync(keyFilename),
-			cert: fs.readFileSync(certFilename)
-		};
-		let server = https.createServer(options, app);
-		logger.info('Starting https server at port ' + securePort);
-		logger.info('Starting http server at port ' + openPort);
-		server.listen(securePort, () => {
-			logger.info('server started.');
-			onListening(server);
-		});
-		server.on('error', (error) => {onError(error, securePort)});
+	let canDoHttps = isEnvDefined('TLS_FILES_PATH') && 
+		isEnvDefined('TLS_KEY_FILENAME') && 
+		isEnvDefined('TLS_CERT_FILENAME');
 
-		// Create HTTP server to redirect requests to HTTPS
-		http.createServer((req, res) => {
-			const portIdx = req.headers.host.indexOf(':');
-			let hostname = req.headers.host;
-			if( portIdx > -1) {
-				hostname = req.headers.host.substring(0, portIdx);
-			}
-			res.writeHead(301, {
-				location:`https://${hostname}:${securePort}${req.url}`
-			})
-			res.end();
-		}).listen(openPort);
+	if (canDoHttps && fs.existsSync(keyFilename) && fs.existsSync(certFilename)) {
+		let keyFilename = path.join(process.env.TLS_FILES_PATH, process.env.TLS_KEY_FILENAME);
+		let certFilename = path.join(process.env.TLS_FILES_PATH, process.env.TLS_CERT_FILENAME);
+		if (fs.existsSync(keyFilename) && fs.existsSync(certFilename)) {
+			let options = { 
+				key: fs.readFileSync(keyFilename),
+				cert: fs.readFileSync(certFilename)
+			};
+			let server = https.createServer(options, app);
+			logger.info('Starting https server at port ' + securePort);
+			logger.info('Starting http server at port ' + openPort);
+			server.listen(securePort, () => {
+				logger.info('server started.');
+				onListening(server);
+			});
+			server.on('error', (error) => {onError(error, securePort)});
+	
+			// Create HTTP server to redirect requests to HTTPS
+			http.createServer((req, res) => {
+				const portIdx = req.headers.host.indexOf(':');
+				let hostname = req.headers.host;
+				if( portIdx > -1) {
+					hostname = req.headers.host.substring(0, portIdx);
+				}
+				res.writeHead(301, {
+					location:`https://${hostname}:${securePort}${req.url}`
+				})
+				res.end();
+			}).listen(openPort);
+		}
 	}
 	// HTTP only fallback
 	else {
