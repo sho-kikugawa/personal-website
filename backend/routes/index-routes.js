@@ -1,5 +1,5 @@
 /**
- * @file Routes for pages from the root URL
+ * @file Routes for pages from the root URL. 
  * 
  */
 const router = require('express').Router()

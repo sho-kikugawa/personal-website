@@ -1,3 +1,6 @@
+/**
+ * @file Mongoose schema file for Blog entries.
+ */
 const mongoose = require('mongoose');
 
 let BlogSchema = new mongoose.Schema({
@@ -7,7 +10,7 @@ let BlogSchema = new mongoose.Schema({
 		unique: true
 	},	// 
 	title: String,			// Big bold title
-	subtitle: String,		// Summary
+	summary: String,		// Short summary of article
 	content: String,		// Markdown content of the article
 	tags: [String],			// Array of tags
 },

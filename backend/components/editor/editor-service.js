@@ -3,6 +3,12 @@ const model = mongoose.model('Editor');
 const logger = require(`../../utils/logger`).logger;
 const cryptoUtil = require('../../utils/crypto');
 
+/**
+ * Creates an account.
+ * @param {String} username - Username of the account
+ * @param {String} password - Password of the account
+ * @returns A Document if the account was created. Null otherwise.
+ */
 async function createAccount(username, password) {
 	const salt = cryptoUtil.generateKey();
 	const hash = await cryptoUtil.getPasswordHash(password, salt);
@@ -15,6 +21,12 @@ async function createAccount(username, password) {
 	return accountData;
 }
 
+/**
+ * Takes a username and password to log into an account.
+ * @param {String} username - Username of the account
+ * @param {String} password - Password of the account
+ * @returns A document if the login is successful, otherwise null.
+ */
 async function editorLogin(username, password) {
 	const queryData = { username: username };
 	const filterData = 'password username editorId';
@@ -34,6 +46,11 @@ async function editorLogin(username, password) {
 	}
 }
 
+/**
+ * Deletes an account based on the username.
+ * @param {String} username - Username of the account
+ * @returns An object containing the results of deleting the account
+ */
 async function deleteAccount(username) {
 	const deleteResult = await model.deleteOne({username: username});
 	return deleteResult;

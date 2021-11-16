@@ -1,6 +1,6 @@
 /**
- * @file Routes for pages showing the blog.
- * 
+ * @file Handles all routes for the root '/blog/'. This handles mostly showing
+ * 		a blog.
  */
 const router = require('express').Router();
 const { getBlog, postFindBlogs } = require('../components/blog/blog-controller');

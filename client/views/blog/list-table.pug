@@ -16,7 +16,7 @@ table.table.table-bordered
 		tr 
 			td
 				a(href=`blog/article/${blog.internalTitle}`) #{blog.title}
-			td #{blog.subtitle} 
+			td #{blog.summary} 
 			td #{blog.dateString}
 			if loggedIn == true
 				td 
@@ -30,4 +30,4 @@ div.blog-list-nav
 	- else if (currentPage > 2)
 		a.btn.btn-secondary(href=`/blogs/page/${currentPage-1}`) Previous Page
 	- if (lastPage === false) 
-		a.btn.btn-secondary(href=`/blogs/page/${currentPage+1}` style="float:right;") Next Page
+		a.btn.btn-secondary(href=`/blogs/page/${currentPage+1}`, style="float:right;") Next Page

@@ -1,6 +1,6 @@
+
 /**
- * @file Routes for pages from the root URL
- * 
+ * @file Handles routes from the '/editors' root.
  */
 const slowDown = require("express-slow-down");
 const router = require('express').Router();
@@ -9,10 +9,17 @@ const {	getCreateBlog, getEditBlog, postEditorLogin, postEditorLogout,
 		postCreateBlog,	postEditBlog, postDeleteBlog} 
 		= require('../components/editor/editor-controller');
 const { handler }= require('./router-utils');
-const { isEnvDefined } = require ('../config');
+const { isEnvDefined } = require ('../config/config');
 const { logger, formatJson } = require("../utils/logger");
 const { RenderData, renderPage } = require('./router-utils');
 
+/**
+ * A wrapper handle requests through the editors route that requires a login.
+ * @param {*} controllerFunc - Function from a controller to handle the route
+ * @param {*} req - Request data (from Express)
+ * @param {*} res - Response data (from Express)
+ * @param {*} next - Callback to the next function (from Express)
+ */
 function editorHandler(controllerFunc, req, res, next) {
 	if ('editor' in req.session) {
 		handler(controllerFunc, req, res, next);
@@ -38,6 +45,9 @@ router.get('/login', (req, res) => {
 })
 
 /* POST routers **************************************************************/
+/**
+ * Sets up the rate limiter for certain routes.
+ */
 const loginSpeedLimiter = slowDown((() => {
 	let limiter = {
 		windowMs: 15 * 60 * 1000, // 15 minutes

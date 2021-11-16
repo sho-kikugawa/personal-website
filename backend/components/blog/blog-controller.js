@@ -1,3 +1,7 @@
+/**
+ * @file Controller for handling all routes pertaining to listing, searching,
+ *       and showing blogs.
+ */
 const marked = require('marked');
 const sanitizer = require('sanitize-html');
 const createError = require('http-errors');
@@ -5,38 +9,43 @@ const blogService = require(`./blog-service`);
 const { logger, formatJson } = require("../../utils/logger");
 const { RenderData, renderPage } = require('../../routes/router-utils');
 
+/**
+ * Grabs a blog based on the URL. If there is no blog, it redirects to a 404
+ * error. Otherwise renders the blog article.
+ * @param {Object} req - Request object (from Express)
+ * @param {Object} res - Response object (from Express)
+ * @param {Object} next - Callback to the handler (from Express)
+ */
 async function getBlog(req, res, next) {
 	const basePath = "/blog/article/";
 	let internalTitle = req.originalUrl.substring(basePath.length);
 
-	if (await blogService.getIfBlogExists(internalTitle) === false)  {
+	let blogData = await blogService.getBlog(internalTitle);
+	logger.debug(`Retreived blog: ${formatJson(blogData)}`);
+	if (blogData === null) {
+		logger.debug(`Failed to retrieve blog for ${internalTitle}`);
 		next(createError(404));
 	}
 	else {
-		let blogData = await blogService.getBlog(internalTitle);
-		logger.debug(`Retreived blog: ${JSON.stringify(blogData)}`);
-		if (blogData !== null) {
-			blogData.content = marked(blogData.content);
-			blogData.content = sanitizer(blogData.content);
-		}
-		else {
-			logger.debug(`Failed to retrieve blog for ${internalTitle}`);
-			blogData = {
-				title: "There's no blog here :<",
-				content: "No really, there isn't."};
-		}
+		blogData.content = marked(blogData.content);
+		blogData.content = sanitizer(blogData.content, {
+			allowedTags: sanitizer.defaults.allowedTags.concat([ 'img' ])
+		});
 		let data = new RenderData(blogData.title, req);
 		data.data = blogData
 		renderPage('blog/blog', data, res);
 	}
 }
 
+/**
+ * Gets a list of blogs, with the starting point based on the page number in
+ * the URL. If no page number is provided, defaults from page 1. If no blogs
+ * are available, flags it for the renderer.
+ * @param {Object} req - Request object (from Express)
+ * @param {Object} res - Response object (from Express)
+ */
 async function getBlogList(req, res) {
-	const pageStep = 15;
 	const numBlogs = await blogService.getNumBlogs();
-	const blogPages = Math.floor(numBlogs / pageStep) + 1;
-	let startAt = 0;
-	let pageNum = 1;
 
 	if (numBlogs === 0) {
 		let data = new RenderData("Blog list", req);
@@ -44,6 +53,11 @@ async function getBlogList(req, res) {
 		renderPage('blog/list', data, res);
 	}
 	else {
+		const pageStep = 15;
+		const blogPages = Math.floor(numBlogs / pageStep) + 1;
+		let startAt = 0;
+		let pageNum = 1;
+		
 		// Parse the page number from the URL
 		if (req.originalUrl.search("page") > -1) {
 			const basePath = "/blogs/page/";
@@ -82,11 +96,16 @@ async function getBlogList(req, res) {
 	}
 }
 
+/**
+ *  Finds all blogs based on a search term.
+ * @param {Object} req - Request object (from Express)
+ * @param {Object} res - Response object (from Express)
+ */
 async function postFindBlogs(req, res) {
-	let queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
-	logger.debug(`Searching for a blog using term ${JSON.stringify(req.body, null, 4)}`);
-	let blogData = await blogService.findBlog(querydata, res);
-	logger.debug(`Blogs retrieved from search: ${JSON.stringify(blogData, null, 4)}`);
+	const queryData = {title: { $regex: req.body.searchTerm, $options: "i"}};
+	const blogData = await blogService.findBlog(queryData, res);
+	logger.debug(`Blogs retrieved from search: ${formatJson(blogDataformatJson)}`);
+	logger.debug(`Search term used: ${formatJson(req.bodyformatJson)}`);
 
 	let data = new RenderData("Blog search results", req);
 	data.blogs = blogData;

@@ -1,10 +1,10 @@
 div.mb-3
 	label.form-label(style="width: 100px;") Title
-	input.form-control(type="text", name="title", placeholder="Enter a title" value=`${data.title}`)
+	input.form-control(type="text", name="title", placeholder="Enter a title" value=`${blogData.title}`)
 div.mb-3
 	label.form-label(style="width: 100px;") Summary 
-	input.form-control(type="text", name="subtitle", placeholder="Enter a summary" value=`${data.subtitle}`)
+	input.form-control(type="text", name="summary", placeholder="Enter a summary" value=`${blogData.summary}`)
 div.mb-3
 	label.form-label Content (Markdown)
-	textarea.form-control(style="font-family: monospace;", name="content", rows="24")=data.content 
+	textarea.form-control(style="font-family: monospace;", name="content", rows="24")=blogData.content 
 button.btn.btn-primary Submit

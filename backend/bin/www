@@ -3,13 +3,12 @@
 /**
  * Module dependencies.
  */
-
-let debug = require('debug');
 let fs = require('fs');
 let http = require('http');
 let https = require('https');
 let { app } = require('../app');
 const logger = require('../utils/logger').logger
+
 /**
  * Get port from environment and store in Express.
  */
@@ -125,5 +124,5 @@ function onListening(server) {
 	let bind = typeof addr === 'string'
 		? 'pipe ' + addr
 		: 'port ' + addr.port;
-	debug('Listening on ' + bind);
+	logger.info('Listening on ' + bind);
 }

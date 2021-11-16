@@ -1,4 +1,7 @@
-
+/**
+ * @file Handles all routes with the root '/blogs/', which primarily handle
+ * 		showing a list of blogs.
+ */
 const router = require('express').Router()
 const { getBlogList } = require('../components/blog/blog-controller');
 const { handler } = require('./router-utils');

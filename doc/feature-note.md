@@ -28,9 +28,9 @@
 - [ ] Reliability
 	- [X] Evaluate how to handle errors 
 	- [X] Logging to a file
-	- [ ] Find a "keep-alive" monitor like nodemon
-- [ ] Cleanup
-	- [ ] Start trimming things that are not actually needed
+	- [ ] Integrate PM2 into the project
+- [X] Cleanup
+	- [X] Start trimming things that are not actually needed
 
 # Nice to have
 - [ ] Showing articles
@@ -38,7 +38,7 @@
 	- [ ] Article view count
 - [ ] Support for blog searching
 	- [ ] By title
-	- [ ] By subtitle/summary
+	- [ ] By summary/summary
 	- [ ] By tags
 	- [ ] Sanitize search inputs (when implemented)
 - [ ] Editor administration

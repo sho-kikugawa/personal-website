@@ -1,4 +1,4 @@
-const {logger} = require('./utils/logger');
+const {logger} = require('../utils/logger');
 /* App specific configuration that doesn't make sense to use in an .env file */
 
 /* Absolutely required environment variables */

@@ -1,6 +1,14 @@
+/**
+ * @file Main app configuration.
+ */
+const path = require('path'); 
+require('dotenv').config({ path: path.join(__dirname, './config/.env') });
+
 const { logger , httpLogger, formatJson } = require('./utils/logger');
-const { checkRequiredEnv, checkUsefulEnv, isEnvDefined } = require ('./config');
-const { requiredEnvs, productionEnvs, dbSchemas } = require ('./config');
+const { checkRequiredEnv, checkUsefulEnv, isEnvDefined } = 
+	require ('./config/config');
+const { requiredEnvs, productionEnvs, dbSchemas } = 
+	require ('./config/config');
 
 /* Setup environment ********************************************************/
 /* Force production environment if NODE_ENV isn't 'development'*/
@@ -52,18 +60,16 @@ app.use(helmet.contentSecurityPolicy({
 	useDefaults: true,
 	directives: {
 		scriptSrc: [ 
-			"'self'",
-			'strict-dynamic', 
+			"'strict-dynamic'", 
 			function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 
-			'unsafe-inline', 
+			"'unsafe-inline'", 
 			'http:', 
 			'https:'
 		],
 		styleSrc: [
 			"'self'", 
-			'strict-dynamic', 
 			function(req, res){ return `'nonce-${res.locals.styleNonce}'`}, 
-			'unsafe-inline', 
+			"'unsafe-inline'", 
 			'http:', 
 			'https:'
 		]
@@ -98,7 +104,6 @@ if(process.env.NODE_ENV === `production`) {
 
 	
 /* Setup Middleware **********************************************************/
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 

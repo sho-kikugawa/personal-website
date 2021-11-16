@@ -1,3 +1,6 @@
+/**
+ * @file Mongoose schema file for Editors.
+ */
 const mongoose = require('mongoose');
 
 let EditorSchema = new mongoose.Schema({

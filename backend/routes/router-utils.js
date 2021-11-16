@@ -1,3 +1,6 @@
+/**
+ * @file Utility fucntions related to routing and web page rendering.1
+ */
 const {generateKey} = require('../utils/crypto');
 class RenderData {
 	constructor(title, req) {
