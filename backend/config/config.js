@@ -16,11 +16,6 @@ const requiredEnvs = [
 const productionEnvs = [
 	'HTTPS_PORT',
 	'LOG_OUTPUT',
-	'RATE_LIMIT_MS',
-	'RATE_MAX_REQS',
-	'TLS_FILES_PATH', 
-	'TLS_CERT_FILENAME',
-	'TLS_KEY_FILENAME',	
 	'DB_USERNAME', 
 	'DB_PASSWORD',
 	'SESSION_TTL',
@@ -33,9 +28,18 @@ const debugEnvs = [
 
 ];
 
-/* Environment variables that don't need to be set */
+/* Environment variables that don't need to be set 
+	For the SSL/TLS cert variables, recommend using a web server to act as a 
+	reverse proxy first. However, the server can still be configured to use
+	SSL/TLS certs directly. 
+*/
 const optionalEnvs = [
-	'LOG_PATH'
+	'LOG_PATH',
+	'RATE_LIMIT_MS',
+	'RATE_MAX_REQS',
+	'TLS_FILES_PATH',
+	'TLS_CERT_FILENAME',
+	'TLS_KEY_FILENAME',
 ];
 
 /* List of DB schema files */

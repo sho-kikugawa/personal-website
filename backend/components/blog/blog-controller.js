@@ -27,10 +27,14 @@ async function getBlog(req, res, next) {
 		next(createError(404));
 	}
 	else {
+		let date = blogData.createdAt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+		date = date.substring(0, 10);
+		blogData.dateString = date;
 		blogData.content = marked(blogData.content);
 		blogData.content = sanitizer(blogData.content, {
 			allowedTags: sanitizer.defaults.allowedTags.concat([ 'img' ])
 		});
+
 		let data = new RenderData(blogData.title, req);
 		data.data = blogData
 		renderPage('blog/blog', data, res);

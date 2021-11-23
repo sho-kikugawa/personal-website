@@ -23,12 +23,12 @@
 		- [X] Sanitize URL
 	- [ ] Must support HTTPS
 		- [X] Works with self-signed cert
-		- [ ] Works with a cert from a CA
+		- [X] Works with a cert from a CA
 	- [X] - Harden sessioning tokens
-- [ ] Reliability
+- [X] Reliability
 	- [X] Evaluate how to handle errors 
 	- [X] Logging to a file
-	- [ ] Integrate PM2 into the project
+	- [X] Integrate PM2 into the project
 - [X] Cleanup
 	- [X] Start trimming things that are not actually needed
 
@@ -50,8 +50,8 @@
 	- [ ] Find a WYSIWYG markdown editor
 	- [ ] Editors can upload images while server is live
 	- [ ] Can preview articles before committing to DB
-- [ ] Reliability
-	- [ ] Work with another web server (Node.js by itself may be iffy)
+- [X] Reliability
+	- [X] Work with another web server (Node.js by itself may be iffy)
 
 # Maybe in the future...
 - [ ] Release this as a thing!

@@ -17,7 +17,7 @@ const TITLE_REGEX = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
  */
 async function getCreateBlog(req, res) {
 	let data = new RenderData('Create a blog', req);
-	data.data = {title: "", summary: "", content: "" };
+	data.blogData = {title: "", summary: "", content: "" };
 	data.newArticle = true;
 	renderPage('editor/publish', data, res);
 }

@@ -1,3 +1,23 @@
 .common-main {
 	margin-top: 5em;
 }
+
+.common-blocks {
+	margin-bottom: 2em;
+}
+
+.blog-list-rtbtn {
+	float: right;
+}
+
+.blog-title {
+	text-align: center;
+}
+
+.blog-content {
+	text-align: justify;
+}
+
+.blog-timestamp {
+	font-size: 0.75em;
+}
