@@ -11,5 +11,30 @@ td:nth-child(2) {
 }
 
 .blog-list-nav {
-	margin-top: 20px;
+	border-top: 2px solid var(--bs-gray-500);
+	padding-top: 20px;
+}
+
+.blog-list-entry-box {
+	border-top: 2px solid var(--bs-gray-500);
+	padding: 10px 5px 10px 5px;
+}
+
+.blog-list-title {
+	color: var(--bs-body-color);
+	text-decoration: none;
+	transition: 200ms;
+}
+
+.blog-list-title:hover {
+	color: var(--bs-primary);
+	transition: 200ms;
+}
+
+.blog-list-summary {
+	color: var(--bs-gray-700);
+}
+
+.blog-list-rtbtn {
+	float: right;
 }

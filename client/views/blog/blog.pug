@@ -1,7 +1,7 @@
 extends ../common/layout
 block content
-	div.bg-light.p-5.rounded
+	div.blog-container.bg-light.p-3.rounded
 		h1.blog-title=data.title
-		h5=data.summary
-		p.blog-timestamp Posted #{data.dateString}
-		p.blog-content!=data.content
+		h5.lead=data.summary
+		time Posted #{data.dateString}
+		p!=data.content

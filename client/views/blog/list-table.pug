@@ -2,28 +2,20 @@ if loggedIn == true
 	div.mb-3(style="text-align: right;")
 		a.btn.btn-primary(href=`/editor/create`) Create new blog
 
-table.table.table-bordered
-	thead 
-		tr.table-secondary.table-bordered 
-			th(scope="col") Title
-			th(scope="col") Summary
-			th(scope="col") Date posted
-			if loggedIn == true
-				th(scope="col") Admin
-				th(scope="col") 
-	tbody 
-	each blog in blogs
-		tr 
-			td
-				a(href=`/blog/article/${blog.internalTitle}`) #{blog.title}
-			td #{blog.summary} 
-			td #{blog.dateString}
-			if loggedIn == true
-				td 
-					a.btn.btn-link(href=`/editor/edit/${blog.internalTitle}`) Edit
-				td
-					form(action=`/editor/delete/${blog.internalTitle}`, method="post")
-						button.btn.btn-link Delete
+each blog in blogs
+	div.blog-list-entry-box
+		h4
+			a.blog-list-title(href=`/blog/article/${blog.internalTitle}`) #{blog.title}
+		p.blog-list-summary.lead #{blog.summary}
+		time Posted #{blog.dateString}
+		if loggedIn == true
+			div.container
+				.row 
+					.col
+						a.btn.btn-link(href=`/editor/edit/${blog.internalTitle}`) Edit
+					.col 
+						form(action=`/editor/delete/${blog.internalTitle}`, method="post")
+							button.btn.btn-link Delete
 div.blog-list-nav
 	- if (currentPage === 2) 
 		a.btn.btn-secondary(href=`/blogs`) Previous Page
