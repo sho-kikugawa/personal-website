@@ -8,7 +8,10 @@ const editorService = require('./editor-service');
 const { logger, formatJson } = require("../../utils/logger");
 const { RenderData, renderPage } = require('../../routes/router-utils');
 
-const TITLE_REGEX = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
+/*	Filters out everything except letters, numbers, punctuation, and 
+	non-visible characters.
+*/
+const FILTER_REGEX = /[^\p{L}\p{N}\p{P}\p{Z}]/gu;
 
 /**
  * Renders the page to create a new blog.
@@ -55,7 +58,13 @@ async function getEditBlog(req, res) {
  * @param {Object} res - Response object (from Express)
  */
 async function postCreateBlog(req, res) {
-	const urlTitle = req.body.title.replace(TITLE_REGEX, '').replaceAll(' ', '-').toLowerCase();
+	// Capping title and summary to 255 characters
+	req.body.summary = req.body.summary.substring(0, 255);
+	req.body.title = req.body.title.substring(0, 255);
+	const urlTitle = req.body.title.replace(FILTER_REGEX, '')
+		.trim()
+		.replaceAll(' ', '-')
+		.toLowerCase();
 	logger.debug(`Creating a blog: ${formatJson(req.body)}`);
 
 	if (await blogService.getIfBlogExists(urlTitle) === true) {
@@ -138,22 +147,30 @@ async function postEditorLogout (req, res) {
  * @param {Object} res - Response object (from Express)
  */
 async function postEditBlog(req, res) {
-	const urlTitle = req.body.title.replace(TITLE_REGEX, '').replaceAll(' ', '-').toLowerCase();
-	logger.debug(`Editing a blog: ${formatJson(req.body)}`);
+	const basePath = "/editor/edit/";
+	const originalUrlTitle = req.originalUrl.substring(basePath.length);
+	const urlTitle = req.body.title.replace(FILTER_REGEX, '')
+		.trim()
+		.replaceAll(' ', '-')
+		.toLowerCase();
+	logger.debug(`Editing a blog from ${originalUrlTitle}: ${formatJson(req.body)}`);
 
-	if (await blogService.getIfBlogExists(urlTitle) === false) {
+	if (await blogService.getIfBlogExists(originalUrlTitle) === false) {
 		let data = new RenderData('Edit blog error', req);
 		data.message = `This blog does not exist :<`;
 		renderPage('editor/response', data, res);
 	}
 	else {
+		// Capping title and summary to 255 characters
+		req.body.summary = req.body.summary.substring(0, 255);
+		req.body.title = req.body.title.substring(0, 255);
 		const updatedBlog = {
 			internalTitle: urlTitle,
-			title: req.body.title,
-			summary: req.body.summary,
+			title: sanitizer(req.body.title),
+			summary: sanitizer(req.body.summary),
 			content: req.body.content
 		}
-		const updateResult = await blogService.updateBlog(urlTitle, updatedBlog);
+		const updateResult = await blogService.updateBlog(originalUrlTitle, updatedBlog);
 		logger.debug(`Update result: ${formatJson(updateResult)}`);
 
 		if (updateResult.modifiedCount === 1) {

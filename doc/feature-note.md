@@ -17,11 +17,11 @@
 	- [x] Client behvaior changes if logged in (e.g., extra buttons somewhere)
 	- [x] Articles can be updated
 	- [x] Separate URL for logging in
-- [ ] Security
+- [X] Security
 	- [X] Sanitize input strings!
 		- [X] Sanitize blog contents
 		- [X] Sanitize URL
-	- [ ] Must support HTTPS
+	- [X] Must support HTTPS
 		- [X] Works with self-signed cert
 		- [X] Works with a cert from a CA
 	- [X] - Harden sessioning tokens

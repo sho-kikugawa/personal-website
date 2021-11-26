@@ -49,12 +49,12 @@ async function getBlog(req, res, next) {
  * @param {Object} res - Response object (from Express)
  */
 async function getBlogList(req, res) {
+	let data = new RenderData("Blog list", req);
 	const numBlogs = await blogService.getNumBlogs();
 
 	if (numBlogs === 0) {
-		let data = new RenderData("Blog list", req);
+		
 		data.currentPage = -1;
-		renderPage('blog/list', data, res);
 	}
 	else {
 		const pageStep = 15;
@@ -90,14 +90,12 @@ async function getBlogList(req, res) {
 			date = date.substring(0, 10);
 			blogEntry.dateString = date;
 		})
-
-		let data = new RenderData("Blog list", req);
 		data.blogs = blogData;
 		data.currentPage = pageNum;
 		data.lastPage = (blogPages === pageNum);
 		data.loggedIn = ('editor' in req.session)
-		renderPage('blog/list', data, res);
 	}
+	renderPage('blog/list', data, res);
 }
 
 /**

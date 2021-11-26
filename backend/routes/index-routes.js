@@ -4,7 +4,6 @@
  */
 const router = require('express').Router()
 const { RenderData, renderPage} = require('./router-utils');
-const { logger } = require('../utils/logger')
 
 /* GET routers****************************************************************/
 router.get('/', (req, res) => {

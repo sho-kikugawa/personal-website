@@ -24,24 +24,31 @@ function getOutputType(logName) {
 	let outputs = [];
 	if (process.env.LOG_OUTPUT === 'logfile') {
 		outputs.push(new transports.DailyRotateFile({
-			datePattern: 'YYYY-MM-DD_HH-mm',
-			filename: path.join(process.env.LOG_PATH, `${logName}-combined.log`),
-			level: 'debug',
+			filename: path.join(process.env.LOG_PATH, `${logName}-info.log`),
+			frequency: '24h',
+			datePattern: 'YYYY-MM-DD',
+			level: 'info',
+			size: '10m',
+			maxFiles: '30d',
 			timestamp: true
 		}));
 		outputs.push(new transports.DailyRotateFile({
 			filename: path.join(process.env.LOG_PATH, `${logName}-errors.log`),
-			datePattern: 'YYYY-MM-DD_HH-mm',
+			frequency: '24h',
+			datePattern: 'YYYY-MM-DD',
 			level: 'error',
+			size: '10m',
+			maxFiles: '30d',
 			timestamp: true
 		}));
 	}
-	outputs.push(new transports.Console());
+	outputs.push(new transports.Console({
+		level: getEnvironment()
+	}));
 	return outputs;
 }
 
-let logger = createLogger({
-	level: getEnvironment(),
+const logger = createLogger({
 	format: combine(
 		colorize(),
 		timestamp({
@@ -53,8 +60,7 @@ let logger = createLogger({
 	transports: getOutputType('server')
 })
 
-let httpLogger = createLogger({
-	level: getEnvironment(),
+const httpLogger = createLogger({
 	format: combine(
 		timestamp({
 			format: 'YYYY-MM-DD HH:mm:ss'
@@ -66,9 +72,7 @@ let httpLogger = createLogger({
 })
 
 httpLogger.stream = {
-	write: (message) => {
-		httpLogger.info(message)
-	}
+	write: message => httpLogger.info(message)
 }
 
 function formatJson(jsonObj) {

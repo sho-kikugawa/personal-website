@@ -83,7 +83,7 @@ router.post('/create', (req, res, next) => {
 	editorHandler(postCreateBlog, req, res, next);
 });
 
-router.post('/edit', (req, res, next) => {
+router.post('/edit/*', (req, res, next) => {
 	editorHandler(postEditBlog, req, res, next);
 });
 

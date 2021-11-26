@@ -9,6 +9,9 @@ html
 			div.row
 				div.col
 				div.col-lg-8
+						if loggedIn == true
+							div.mb-3(style="text-align: right;")
+								a.btn.btn-primary(href=`/editor/create`) Create new blog
 						- if(currentPage === -1)
 								p No blogs posted yet!
 						- else 

@@ -109,9 +109,7 @@ const morgan = require('morgan');
 
 app.set('views', path.join(__dirname, '../client/views'))
 app.set('view engine', 'pug')
-app.use(morgan('short', {
-	stream: httpLogger.stream
-}))
+app.use(morgan('short', {stream: httpLogger.stream}))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(express.static(path.join(__dirname, '../client/public')))

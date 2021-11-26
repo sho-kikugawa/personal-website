@@ -2,7 +2,7 @@
  * @file Handles connecting to, disconnecting, and basic statusing of a MongoDB
  * 			server.
  */
-const logger = require('../utils/logger').logger
+const {logger} = require('../utils/logger')
 const mongoose = require('mongoose')
 
 /**

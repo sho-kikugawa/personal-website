@@ -1,7 +1,3 @@
-if loggedIn == true
-	div.mb-3(style="text-align: right;")
-		a.btn.btn-primary(href=`/editor/create`) Create new blog
-
 each blog in blogs
 	div.blog-list-entry-box
 		h4
@@ -11,11 +7,11 @@ each blog in blogs
 		if loggedIn == true
 			div.container
 				.row 
-					.col
-						a.btn.btn-link(href=`/editor/edit/${blog.internalTitle}`) Edit
+					.col-1
+						a.btn.btn-secondary(href=`/editor/edit/${blog.internalTitle}`) Edit
 					.col 
 						form(action=`/editor/delete/${blog.internalTitle}`, method="post")
-							button.btn.btn-link Delete
+							button.btn.btn-secondary Delete
 div.blog-list-nav
 	- if (currentPage === 2) 
 		a.btn.btn-secondary(href=`/blogs`) Previous Page
