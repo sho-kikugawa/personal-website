@@ -10,10 +10,11 @@ html
 				div.col
 				div.col-lg-8
 						if loggedIn == true
-							div.mb-3(style="text-align: right;")
+							div.mb-3
 								a.btn.btn-primary(href=`/editor/create`) Create new blog
 						- if(currentPage === -1)
 								p No blogs posted yet!
 						- else 
 								include list-table.pug
 				div.col
+		include ../common/footer.pug

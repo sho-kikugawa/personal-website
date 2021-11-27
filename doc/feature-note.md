@@ -47,9 +47,9 @@
 	- [ ] Update tools to make it more of a stand-alone thing
 - [ ] Pushing content while site is live
 	- [ ] Support a publish time (article goes live at specific time)
-	- [ ] Find a WYSIWYG markdown editor
-	- [ ] Editors can upload images while server is live
-	- [ ] Can preview articles before committing to DB
+	- [X] ~~Find a WYSIWYG markdown editor~~
+	- [X] ~~Editors can upload images while server is live~~
+	- [x] Can preview articles before committing to DB
 - [X] Reliability
 	- [X] Work with another web server (Node.js by itself may be iffy)
 

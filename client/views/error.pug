@@ -3,5 +3,5 @@ block content
 	div.bg-light.p-5
 		h3= message
 		p= error.status
-		div(style="max-width: 1440px; overflow: auto;")
+		div.error-container
 			pre #{error.stack}

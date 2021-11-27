@@ -1,10 +1,21 @@
-
-extends ../common/layout
-block content
-	div.bg-light.p-5.rounded
-		- if(newArticle === true) 
-			form(action="/editor/create", method="post")
-				include ./editor-body.pug
-		- else 
-			form(action=`/editor/edit/${blogData.internalTitle}`, method="post")
-				include ./editor-body.pug
+doctype html
+html
+	head
+		include ../common/head.pug
+		link(href='/css/blog-editor.css' rel="stylesheet" nonce=styleNonce)
+		script(src="/js/blog-edit.js" nonce=scriptNonce defer)
+	body
+		include ../common/navbar.pug
+		main.container.common-main
+			div.row
+				div.col
+				div.col-lg-8.bg-light.p-5.rounded
+					- if(newArticle === true) 
+						form(id="editor-form" action="/editor/create", method="post")
+							include ./editor-body.pug
+					- else 
+						form(id="editor-form" action=`/editor/edit/${blogData.internalTitle}`, method="post")
+							include ./editor-body.pug
+				div.col
+		footer.py-3.my-4
+			p.text-center.text-muted &copy; #{new Date().getFullYear()} Sho Kikugawa

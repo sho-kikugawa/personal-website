@@ -1,10 +1,11 @@
 div.mb-3
-	label.form-label(style="width: 100px;") Title
-	input.form-control(type="text", name="title", placeholder="Enter a title" value=`${blogData.title}`)
+	label.form-label.editor-label Title
+	input.form-control(id="blog-title" type="text", name="title", placeholder="Enter a title" value=`${blogData.title}`)
 div.mb-3
-	label.form-label(style="width: 100px;") Summary 
-	input.form-control(type="text", name="summary", placeholder="Enter a summary" value=`${blogData.summary}`)
+	label.form-label.editor-label Summary 
+	input.form-control(id="blog-summary" type="text", name="summary", placeholder="Enter a summary" value=`${blogData.summary}`)
 div.mb-3
 	label.form-label Content (Markdown)
-	textarea.form-control(style="font-family: monospace;", name="content", rows="24")=blogData.content 
-button.btn.btn-primary Submit
+	textarea.form-control.editor-textarea(id="blog-content" name="content", rows="24")=blogData.content
+button.btn.btn-primary.editor-btn Submit
+button.btn.btn-light.editor-btn(id="preview-btn" onclick="submitPreview") Preview

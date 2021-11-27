@@ -1,0 +1,16 @@
+.editor-label {
+	width: 100px;
+}
+
+.editor-textarea {
+	font-family: monospace;
+}
+
+.editor-btn {
+	margin-right: 12px;
+}
+
+.preview-form {
+	height: 0px;
+	overflow: hidden;
+}

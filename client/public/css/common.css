@@ -7,6 +7,10 @@ img {
 	max-height:100%;
 }
 
+footer > p {
+	font-size: 0.75em;
+}
+
 .common-main {
 	margin-top: 5em;
 }
@@ -15,12 +19,15 @@ img {
 	margin-bottom: 2em;
 }
 
-
-
 .blog-title {
 	text-align: center;
 }
 
 .blog-container {
 	text-align: justify;
+}
+
+.error-container {
+	max-width: 1440px; 
+	overflow: auto;
 }

@@ -5,8 +5,10 @@
 const slowDown = require("express-slow-down");
 const router = require('express').Router();
 const createError = require('http-errors');
-const {	getCreateBlog, getEditBlog, postEditorLogin, postEditorLogout,
-		postCreateBlog,	postEditBlog, postDeleteBlog} 
+const {	getCreateBlog, getEditBlog, 
+		postEditorLogin, postEditorLogout,
+		postCreateBlog,
+		postEditBlog, postPreviewBlog, postDeleteBlog} 
 		= require('../components/editor/editor-controller');
 const { handler }= require('./router-utils');
 const { isEnvDefined } = require ('../config/config');
@@ -86,6 +88,10 @@ router.post('/create', (req, res, next) => {
 router.post('/edit/*', (req, res, next) => {
 	editorHandler(postEditBlog, req, res, next);
 });
+
+router.post('/preview', (req, res, next) => {
+	editorHandler(postPreviewBlog, req, res, next);
+})
 
 router.post('/delete/*', (req, res, next) => {
 	editorHandler(postDeleteBlog, req, res, next);

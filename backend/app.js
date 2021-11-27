@@ -62,9 +62,7 @@ app.use(helmet.contentSecurityPolicy({
 		scriptSrc: [ 
 			"'strict-dynamic'", 
 			function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 
-			"'unsafe-inline'", 
-			'http:', 
-			'https:'
+
 		],
 		styleSrc: [
 			"'self'", 

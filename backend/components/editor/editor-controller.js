@@ -2,6 +2,7 @@
  * @file Controller for handling all routes pertaining to editor functions,
  * 		including logging in and creating, editing, and deleting blogs.
  */
+const marked = require('marked');
 const sanitizer = require('sanitize-html');
 const blogService = require('../blog/blog-service');
 const editorService = require('./editor-service');
@@ -184,6 +185,24 @@ async function postEditBlog(req, res) {
 	}
 }
 
+async function postPreviewBlog(req, res) {
+	let date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+	date = date.substring(0, 10);
+	blogData = {
+		title: `PREVIEW: ${sanitizer(req.body.title)}`,
+		summary: sanitizer(req.body.summary),
+		content: marked(req.body.content),
+		dateString: date
+	}
+	blogData.content = sanitizer(blogData.content, {
+		allowedTags: sanitizer.defaults.allowedTags.concat([ 'img' ])
+	});
+
+	let data = new RenderData(blogData.title, req);
+	data.data = blogData
+	renderPage('blog/blog', data, res);
+}
+
 /**
  * Handles a post request to delete the blog.
  * @param {Object} req - Request object (from Express) Uses the body object
@@ -222,5 +241,6 @@ module.exports = {
 	postEditorLogout,
 	postCreateBlog,
 	postEditBlog,
+	postPreviewBlog,
 	postDeleteBlog
 };
