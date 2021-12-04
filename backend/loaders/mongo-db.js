@@ -19,7 +19,7 @@ const mongoose = require('mongoose')
  * @param {String[]} schemaFiles - Array of strings containing the paths to the
  * 		schema files.
  */
-function initMongo(dbParameters, schemaFiles=[]){
+function setup(dbParameters, schemaFiles=[]){
 	mongoose.Promise = global.Promise;
 	const MONGO_DB_URI = `mongodb://${dbParameters.ipAddress}:${dbParameters.portNumber}`
 	
@@ -48,23 +48,6 @@ function initMongo(dbParameters, schemaFiles=[]){
 	})
 }
 
-/**
- * Gets the connection state to the database
- * @returns MongoDB connection state
- */
-function getConnectionState() {
-	return mongoose.connection.readyState
-}
-
-/**
- * Closes the MongoDB connection
- */
-function closeConnection() {
-	mongoose.connection.close()
-}
-
 module.exports = {
-	initMongo,
-	getConnectionState,
-	closeConnection
+	setup
 }

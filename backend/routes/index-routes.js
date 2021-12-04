@@ -3,7 +3,9 @@
  * 
  */
 const router = require('express').Router()
-const { RenderData, renderPage} = require('./router-utils');
+const { RenderData, renderPage} = require('../utils/router-utils');
+
+const basepath = '/'
 
 /* GET routers****************************************************************/
 router.get('/', (req, res) => {
@@ -16,4 +18,7 @@ router.get('/about', (req, res) => {
 	renderPage('about', data, res);
 })
 
-module.exports = router;
+module.exports = {
+	router,
+	basepath
+};

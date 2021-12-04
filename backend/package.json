@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"description": "Sho's personal webstie",
 	"scripts": {
-		"start": "pm2 start bin/www",
-		"dev": "nodemon bin/www --trace-warnings"
+		"start": "pm2 start app.js",
+		"dev": "nodemon app.js --trace-warnings"
 	},
 	"author": "Sho kikugawa",
 	"license": "MIT",

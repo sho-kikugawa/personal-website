@@ -3,8 +3,10 @@
  * 		showing a list of blogs.
  */
 const router = require('express').Router()
-const { getBlogList } = require('../components/blog/blog-controller');
-const { handler } = require('./router-utils');
+const { getBlogList } = require('../service/blog');
+const { handler } = require('../utils/router-utils');
+
+const basepath = '/blogs'
 
 // Will default to the first page
 router.get('/', (req, res, next) => {
@@ -19,4 +21,7 @@ router.get('/page/*', (req, res, next) => {
 // Redirect all URLs after /blogs/ to just /blogs
 router.get('/*', (req, res) => {res.redirect('/blogs')});
 
-module.exports = router;
+module.exports = {
+	router,
+	basepath
+};

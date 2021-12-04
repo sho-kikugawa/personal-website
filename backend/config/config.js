@@ -1,78 +1,45 @@
-const {logger} = require('../utils/logger');
-/* App specific configuration that doesn't make sense to use in an .env file */
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-/* Absolutely required environment variables */
-const requiredEnvs = [
-	'PORT',  
-	'DB_IP', 
-	'DB_PORT', 
-	'DB_NAME',
+function getConfig() {
+	let config = {
+		environment: 'production' || process.env.NODE_ENV,
+		httpPort: 3000 || process.env.PORT,
+		httpsPort: 3001 || process.env.HTTPS_PORT,
+		database: {
+			url: 'localhost' || process.env.DB_IP,
+			port: 27017 || process.env.DB_PORT,
+			name: 'test' || process.env.DB_NAME,
+			username: '' || process.env.DB_USERNAME,
+			password: '' || process.env.DB_PASSWORD
+		},
+		certs: {
+			path: '' || process.env.TLS_FILES_PATH,
+			certFile: '' || process.env.TLS_CERT_FILENAME,
+			keyFile: '' || process.env.TLS_KEY_FILENAME
 
-	'SESSION_NAME', 
-	'SESSION_SECRET', 
-];
-
-/* Environment variables required in production */
-const productionEnvs = [
-	'HTTPS_PORT',
-	'LOG_OUTPUT',
-	'DB_USERNAME', 
-	'DB_PASSWORD',
-	'SESSION_TTL',
-	'SESSION_DB_IP',
-	'SESSION_DB_PORT'
-]
-
-/* Environment variables meant only for development/debug */
-const debugEnvs = [
-
-];
-
-/* Environment variables that don't need to be set 
-	For the SSL/TLS cert variables, recommend using a web server to act as a 
-	reverse proxy first. However, the server can still be configured to use
-	SSL/TLS certs directly. 
-*/
-const optionalEnvs = [
-	'LOG_PATH',
-	'RATE_LIMIT_MS',
-	'RATE_MAX_REQS',
-	'TLS_FILES_PATH',
-	'TLS_CERT_FILENAME',
-	'TLS_KEY_FILENAME',
-];
-
-/* List of DB schema files */
-const dbSchemas = [
-	'../components/blog/blog-schema',
-	'../components/editor/editor-schema'
-];
-
-function checkRequiredEnv(envName) {
-	if (isEnvDefined(envName) === false) {
-		logger.error(`Environment variable ${envName} is needed but not defined, exiting`);
-		process.exit();
+		},
+		session: {
+			type: 'default' || process.env.SESSION_TYPE,
+			name: 'CHANGEME' || process.env.SESSION_NAME,
+			secret: 'CHANGEME' || process.env.SESSION_SECRET,
+			cookieSecret: 'CHANGEME' || process.env.SESSION_COOKIE_SECRET,
+			ttl: (365 * 24 * 60 * 1000) || process.env.SESSION_TTL,
+	
+			dbIp: 'localhost' || process.env.SESSION_DB_IP,
+			dbPort: 6379 || process.env.SESSION_DB_PORT,
+			dbUsername: '' || process.env.SESSION_DB_USERNAME,
+			dbPassword: '' || process.env.SESSION_DB_PASSWORD,
+		},
+		rateLimiter: {
+			limitMs: (10 * 60 * 1000) || process.env.RATE_LIMIT_MS,
+			maxReq: 100 || process.env.RATE_MAX_REQS,
+			timeoutMs: (15 * 60 * 1000) || process.env.POST_WINDOW_TIMEOUT,
+			delayAfter: 5 || process.env.POST_DELAY_AFTER,
+			delayMs: 250 || process.env.POST_DELAY_MS,
+		},
 	}
+	return config;
 }
 
-function checkUsefulEnv (envName) {
-	if (isEnvDefined(envName) === false) {
-		logger.warn(`Environment variable ${envName} is not defined, consider defining it`);
-	}
-}
-
-function isEnvDefined(envName) {
-	return ((envName in process.env) === true && process.env[envName] !== '');
-}
-
-module.exports = {
-	requiredEnvs,
-	productionEnvs,
-	debugEnvs,
-	optionalEnvs,
-	dbSchemas,
-
-	checkRequiredEnv,
-	checkUsefulEnv,
-	isEnvDefined
-}
+module.exports = getConfig;

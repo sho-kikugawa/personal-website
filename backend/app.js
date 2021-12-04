@@ -1,179 +1,45 @@
 /**
  * @file Main app configuration.
  */
-const path = require('path'); 
-require('dotenv').config({ path: path.join(__dirname, './config/.env') });
-
-const { logger , httpLogger, formatJson } = require('./utils/logger');
-const { checkRequiredEnv, checkUsefulEnv, isEnvDefined } = 
-	require ('./config/config');
-const { requiredEnvs, productionEnvs, dbSchemas } = 
-	require ('./config/config');
+const fs = require('fs');
+const path = require('path');
 
 /* Setup environment ********************************************************/
-/* Force production environment if NODE_ENV isn't 'development'*/
-if (process.env.NODE_ENV !== 'development') {
-	process.env.NODE_ENV = `production`
-}
-logger.info(`Running server in a [${process.env.NODE_ENV}] environment`);
-
-/** Verify required environment variables and exit if they're not defined */
-requiredEnvs.forEach(checkRequiredEnv);
-
-if (process.env.NODE_ENV === `production`) {
-	productionEnvs.forEach(checkRequiredEnv);
-}
-else if(process.env.NODE_ENV === `development`) {
-	productionEnvs.forEach(checkUsefulEnv);
-}
+const config = require('./config/config')();
+const { logger, formatJson } = require('./utils/logger');
+logger.debug(`Config: ${formatJson(config)}`);
 
 /* Setup DB ******************************************************************/
-const dbParams = {
-	ipAddress: process.env.DB_IP,
-	portNumber: process.env.DB_PORT, 
-	dbName: process.env.DB_NAME, 
-	username: process.env.DB_USERNAME,
-	password: process.env.DB_PASSWORD
-}
-require('./dbs/mongo-db').initMongo(dbParams, dbSchemas);
+/* Build the database schema file list */
+const dbSchemas = []; 
+fs.readdirSync('./models').forEach(file => {
+	dbSchemas.push(path.join(__dirname, 'models', file));
+})
+require('./config/mongo-db').initMongo(config.database, dbSchemas);
 
 /* Create Express Instance ***************************************************/
 const express = require('express');
-var app = express()
+let app = express();
 
-/* Setup security/reliability packages ***************************************/
-const helmet = require('helmet');
-const xssClean = require('xss-clean');
-const hpp = require('hpp');
-const mongoSantiize = require('express-mongo-sanitize');
-const rateLimit = require('express-rate-limit');
-const { generateKey } = require('./utils/crypto')
+/* Load and setup security packages ******************************************/
+require('./loaders/security-loader')(app, config);
 
-app.use(function(req, res, next) {
-	res.locals.styleNonce = generateKey();
-	res.locals.scriptNonce = generateKey();
-	next()
-});
-
-app.use(helmet());
-app.use(helmet.contentSecurityPolicy({
-	useDefaults: true,
-	directives: {
-		scriptSrc: [ 
-			"'strict-dynamic'", 
-			function(req, res){ return `'nonce-${res.locals.scriptNonce}'`}, 
-
-		],
-		styleSrc: [
-			"'self'", 
-			function(req, res){ return `'nonce-${res.locals.styleNonce}'`}, 
-			"'unsafe-inline'", 
-			'http:', 
-			'https:'
-		]
-	}
-}));
-app.use(xssClean());
-app.use(hpp());
-app.use(mongoSantiize());
-
-if(process.env.NODE_ENV === `production`) {
-	let limitMs = 10 * 60 * 1000; // 10 minutes
-	let maxReq = 100;
-
-	if (isEnvDefined('RATE_LIMIT_MS') === true) {
-		const envVal = parseInt(process.env.RATE_LIMIT_MS);
-		limitMs = (isNaN(envVal)) ? limitMs : envVal;
-	}
-	if (isEnvDefined('RATE_MAX_REQS') === true) {
-		const envVal = parseInt(process.env.RATE_MAX_REQS);
-		maxReq = (isNaN(envVal)) ? maxReq : envVal;
-	}
-
-	const  limiter = rateLimit({
-		windowMs: limitMs,
-		max: maxReq
-	});
-
-	logger.debug(`Rate limit time: ${limitMs}ms`);
-	logger.debug(`Request limit: ${maxReq}`);
-	app.use(limiter);
-}
-
-	
-/* Setup Middleware **********************************************************/
-const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-
-app.set('views', path.join(__dirname, '../client/views'))
-app.set('view engine', 'pug')
-app.use(morgan('short', {stream: httpLogger.stream}))
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
-app.use(express.static(path.join(__dirname, '../client/public')))
-
-/* Setup Sessioning **********************************************************/
-let expiryTime = parseInt(process.env.SESSION_TTL, 10);
-if (isNaN(expiryTime) === true) {
-	expiryTime = 5 * 60 * 1000;
-}
-
-let sessionParams = {
-	name: process.env.SESSION_NAME,
-	secret: process.env.SESSION_SECRET,
-	resave: false,
-	cookie: { 
-		maxAge: expiryTime,
-		secure: true,
-	},
-	saveUninitialized: true
+/* Load and setup server middleware ******************************************/
+const clientPaths = { 
+	views: path.join(__dirname, '../client/views'),
+	public: path.join(__dirname, '../client/public')
 };
+require('./loaders/server-loader')(app, clientPaths);
 
-if (isEnvDefined('SESSION_TYPE') === true && process.env.SESSION_TYPE === 'db') {
-	const redis = require('redis');
-	const expressSession = require('express-session');
-	const connectRedis = require('connect-redis');
-	const redisStore = connectRedis(expressSession);
-	const redisClient = redis.createClient();
-	logger.info(`Using Redis sessioning`);
+/* Load and setup sessioning *************************************************/
+require('./loaders/session-loader')(app, config.session);
 
-	redisClient.auth(process.env.SESSION_DB_PASSWORD);
-	app.use(expressSession({
-		secret: process.env.SESSION_SECRET,
-		store: new redisStore({ 
-			host: process.env.SESSION_DB_IP, 
-			port: process.env.SESSION_DB_PORT, 
-			client: redisClient,
-			ttl :  300}),
-		saveUninitialized: false,
-		resave: false
-	}));
-	app.use(cookieParser(process.env.SESSION_COOKIE_SECRET));
-
-	redisClient.on('error', (err) => {
-		logger.error(`Reddis error: ${formatJson(err)}`);
-	});
-	redisClient.on('connect', (err) => {
-		logger.info(`Connected to Redis`);
-	});
-}
-else {
-	logger.info(`Using Express sessioning`);
-	const session = require('express-session')(sessionParams);
-	app.use(session);
-}
+/* Load and setup sessioning *************************************************/
+require('./loaders/session-loader')(app, config.session);
 
 /* Setup Routes **************************************************************/
-const indexRoutes = require('./routes/index-routes');
-const blogRoutes = require('./routes/blog-routes');
-const blogsRoutes = require('./routes/blogs-routes');
-const editorRoutes = require('./routes/editor-routes');
-app.use('/', indexRoutes);
-app.use('/blog', blogRoutes);
-app.use('/blogs', blogsRoutes);
-app.use('/editor', editorRoutes)
-
-/* Perform other initialziations *********************************************/
+const staticRoutesPath = path.join(__dirname, 'routes');
+require('./loaders/routes-loader')(app, staticRoutesPath);
 
 /* Launch the listeners ******************************************************/
 const createError = require('http-errors');
@@ -211,6 +77,87 @@ app.use(function (err, req, res, next) {
 	res.render('error', data);
 })
 
-module.exports = {
-	app,
+/* Create and start server ***************************************************/
+const http = require('http');
+const server = http.createServer(app);
+logger.info('Starting server at port ' + config.httpPort);
+server.listen(config.httpPort, () => {
+	logger.info('server started.')
+	onListening(server);
+});
+
+try {
+	const certFilename = path.join(__dirname, config.certs.path, config.certs.certFile);
+	const keyFilename = path.join(__dirname, config.certs.path, config.certs.keyFile);
+
+	if (fs.existsSync(keyFilename) && fs.existsSync(certFilename)) {
+		let options = { 
+			key: fs.readFileSync(keyFilename),
+			cert: fs.readFileSync(certFilename)
+		};
+		let server = https.createServer(options, app);
+		logger.info('Starting https server at port ' + config.httpsPort);
+		logger.info('Starting http server at port ' + config.port);
+		server.listen(config.httpsPort, () => {
+			logger.info('server started.');
+			onListening(server);
+		});
+		server.on('error', (error) => {onError(error, config.httpsPort)});
+
+		// Create HTTP server to redirect requests to HTTPS
+		http.createServer((req, res) => {
+			const portIdx = req.headers.host.indexOf(':');
+			let hostname = req.headers.host;
+			if( portIdx > -1) {
+				hostname = req.headers.host.substring(0, portIdx);
+			}
+			res.writeHead(301, {
+				location:`https://${hostname}:${config.httpsPort}${req.url}`
+			})
+			res.end();
+		}).listen(config.port);
+	}
+	// HTTP only fallback
+	else {
+		logger.warn(`THIS SERVER IS BEING RUN IN HTTP ONLY MODE`);
+		let server = http.createServer(app);
+		logger.info('Starting http server at port ' + config.port)
+		server.listen(config.port, () => {
+			logger.info('server started.')
+			onListening(server);
+		});
+		server.on('error', (error) => {onError(error, config.port)});
+	}
+}
+catch (err) {
+	logger.error(err);
+}
+
+function onError(error, port) {
+	if (error.syscall !== 'listen') { throw error; }
+
+	let bind = typeof port === 'string'	? 'Pipe ' + port : 'Port ' + port;
+
+	// handle specific listen errors with friendly messages
+	switch (error.code) {
+		case 'EACCES':
+			console.error(bind + ' requires elevated privileges');
+			process.exit(1);
+		case 'EADDRINUSE':
+			console.error(bind + ' is already in use');
+			process.exit(1);
+		default:
+			throw error;
+	}
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+function onListening(server) {
+	let addr = server.address();
+	let bind = typeof addr === 'string'
+		? 'pipe ' + addr
+		: 'port ' + addr.port;
+	logger.debug('Listening on ' + bind);
 }

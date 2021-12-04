@@ -1,7 +1,7 @@
 /**
  * @file Utility fucntions related to routing and web page rendering.1
  */
-const {generateKey} = require('../utils/crypto');
+const {generateKey} = require('./crypto');
 class RenderData {
 	constructor(title, req) {
 		this.headTitle = `${title} | Sho and Tell`;
