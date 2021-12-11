@@ -3,19 +3,20 @@
  * 
  */
 const router = require('express').Router()
-const { RenderData, renderPage} = require('../utils/router-utils');
+const { RenderData } = require('../utils/render-data');
+const { logger, formatJson } = require('../utils/logger'); 
 
-const basepath = '/'
+const basepath = '/';
 
 /* GET routers****************************************************************/
 router.get('/', (req, res) => {
-	const data = new RenderData('Home', req);
-	renderPage('index', data, res);
+	const data = new RenderData('Home', req.session, res.locals);
+	res.render('index', data);
 })
 
 router.get('/about', (req, res) => {
-	const data = new RenderData('About', req);
-	renderPage('about', data, res);
+	const data = new RenderData('About', req.session, res.locals);
+	res.render('about', data);
 })
 
 module.exports = {

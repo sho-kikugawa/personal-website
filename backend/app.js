@@ -15,35 +15,42 @@ const dbSchemas = [];
 fs.readdirSync('./models').forEach(file => {
 	dbSchemas.push(path.join(__dirname, 'models', file));
 })
-require('./config/mongo-db').initMongo(config.database, dbSchemas);
+require('./loaders/mongo-db').setup(config.database, dbSchemas);
 
 /* Create Express Instance ***************************************************/
 const express = require('express');
 let app = express();
 
 /* Load and setup security packages ******************************************/
-require('./loaders/security-loader')(app, config);
+require('./loaders/security')(app, config);
 
 /* Load and setup server middleware ******************************************/
 const clientPaths = { 
 	views: path.join(__dirname, '../client/views'),
 	public: path.join(__dirname, '../client/public')
 };
-require('./loaders/server-loader')(app, clientPaths);
+require('./loaders/server')(app, clientPaths);
 
 /* Load and setup sessioning *************************************************/
-require('./loaders/session-loader')(app, config.session);
-
-/* Load and setup sessioning *************************************************/
-require('./loaders/session-loader')(app, config.session);
+require('./loaders/session')(app, config.session);
 
 /* Setup Routes **************************************************************/
 const staticRoutesPath = path.join(__dirname, 'routes');
-require('./loaders/routes-loader')(app, staticRoutesPath);
+require('./loaders/routes')(app, staticRoutesPath);
+// const files = fs.readdirSync(path.join(__dirname, 'routes'));
+
+// files.forEach(file => {
+// 	const filepath = path.join(__dirname, 'routes', file);
+// 	const router = require(filepath);
+	
+// 	logger.debug(`Loading route ${router.basepath} from ${file}`);
+// 	app.use(`/${router.basepath}/`, router.router);
+// })
+// app.use('/', require(path.join(__dirname, 'routes', 'index-routes.js')).router);
 
 /* Launch the listeners ******************************************************/
 const createError = require('http-errors');
-const { RenderData } = require('./routes/router-utils');
+const { RenderData } = require('./utils/render-data');
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
 	res.status(404);
@@ -51,7 +58,7 @@ app.use(function (req, res, next) {
 		next(createError(404));
 	}
 	else {
-		const data = new RenderData('Page not found', req)
+		const data = new RenderData('Page not found', req.session, res.locals);
 		next(res.render('404', data));
 	}
 })
@@ -71,7 +78,7 @@ app.use(function (err, req, res, next) {
 
 	// render the error page
 	res.status(err.status || 500)
-	let data = new RenderData('Website error', req);
+	let data = new RenderData('Website error', req.session, res.locals);
 	data.message = res.locals.message;
 	data.error = res.locals.error;
 	res.render('error', data);
@@ -79,59 +86,62 @@ app.use(function (err, req, res, next) {
 
 /* Create and start server ***************************************************/
 const http = require('http');
-const server = http.createServer(app);
-logger.info('Starting server at port ' + config.httpPort);
+let server = http.createServer(app);
+logger.info('Starting http server at port ' + config.httpPort)
 server.listen(config.httpPort, () => {
 	logger.info('server started.')
 	onListening(server);
 });
+server.on('error', (error) => {onError(error, config.httpPort)});
 
-try {
-	const certFilename = path.join(__dirname, config.certs.path, config.certs.certFile);
-	const keyFilename = path.join(__dirname, config.certs.path, config.certs.keyFile);
+// try {
+// 	const certFilename = path.join(__dirname, config.certs.path, config.certs.certFile);
+// 	const keyFilename = path.join(__dirname, config.certs.path, config.certs.keyFile);
+// 	if (config.certs.certFile && config.certs.keyFile && 
+// 		fs.existsSync(keyFilename) && fs.existsSync(certFilename)) 
+// 	{
+// 		let options = { 
+// 			key: fs.readFileSync(keyFilename),
+// 			cert: fs.readFileSync(certFilename)
+// 		};
+// 		server = https.createServer(options, app);
+// 		logger.info('Starting https server at port ' + config.httpsPort);
+// 		logger.info('Starting http server at port ' + config.httpPort);
+// 		server.listen(config.httpsPort, () => {
+// 			logger.info('server started.');
+// 			onListening(server);
+// 		});
+// 		server.on('error', (error) => {onError(error, config.httpsPort)});
 
-	if (fs.existsSync(keyFilename) && fs.existsSync(certFilename)) {
-		let options = { 
-			key: fs.readFileSync(keyFilename),
-			cert: fs.readFileSync(certFilename)
-		};
-		let server = https.createServer(options, app);
-		logger.info('Starting https server at port ' + config.httpsPort);
-		logger.info('Starting http server at port ' + config.port);
-		server.listen(config.httpsPort, () => {
-			logger.info('server started.');
-			onListening(server);
-		});
-		server.on('error', (error) => {onError(error, config.httpsPort)});
-
-		// Create HTTP server to redirect requests to HTTPS
-		http.createServer((req, res) => {
-			const portIdx = req.headers.host.indexOf(':');
-			let hostname = req.headers.host;
-			if( portIdx > -1) {
-				hostname = req.headers.host.substring(0, portIdx);
-			}
-			res.writeHead(301, {
-				location:`https://${hostname}:${config.httpsPort}${req.url}`
-			})
-			res.end();
-		}).listen(config.port);
-	}
-	// HTTP only fallback
-	else {
-		logger.warn(`THIS SERVER IS BEING RUN IN HTTP ONLY MODE`);
-		let server = http.createServer(app);
-		logger.info('Starting http server at port ' + config.port)
-		server.listen(config.port, () => {
-			logger.info('server started.')
-			onListening(server);
-		});
-		server.on('error', (error) => {onError(error, config.port)});
-	}
-}
-catch (err) {
-	logger.error(err);
-}
+// 		// Create HTTP server to redirect requests to HTTPS
+// 		http.createServer((req, res) => {
+// 			const portIdx = req.headers.host.indexOf(':');
+// 			let hostname = req.headers.host;
+// 			if( portIdx > -1) {
+// 				hostname = req.headers.host.substring(0, portIdx);
+// 			}
+// 			res.writeHead(301, {
+// 				location:`https://${hostname}:${config.httpsPort}${req.url}`
+// 			})
+// 			res.end();
+// 		}).listen(config.httpPort);
+// 	}
+// 	// HTTP only fallback
+// 	else {
+// 		logger.warn(`THIS SERVER IS BEING RUN IN HTTP ONLY MODE`);
+// 		let server = http.createServer(app);
+// 		logger.info('Starting http server at port ' + config.httpPort)
+// 		server.listen(config.httpPort, () => {
+// 			logger.info('server started.')
+// 			onListening(server);
+// 		});
+// 		server.on('error', (error) => {onError(error, config.httpPort)});
+// 	}
+// }
+// catch (err) {
+// 	logger.error('Server setup had an error');
+// 	logger.error(err);
+// }
 
 function onError(error, port) {
 	if (error.syscall !== 'listen') { throw error; }

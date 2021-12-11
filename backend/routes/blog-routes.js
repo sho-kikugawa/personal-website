@@ -3,14 +3,28 @@
  * 		a blog.
  */
 const router = require('express').Router();
-const { getBlog, postFindBlogs } = require('../components/blog/blog-controller');
-const { handler } = require('./router-utils')
+const { RenderData } = require('../utils/render-data');
+const { getBlog, postFindBlogs } = require('../service/blog');
 
 const basepath = '/blog'
 /* GET routers ***************************************************************/
 // Capture all URLs with this base
 router.get("/article/*", (req, res, next) => {
-	handler(getBlog, req, res, next);
+	getBlog(req.originalUrl)
+	.then(blogData => {
+		if(blogData !== null) {
+			let pageData = new RenderData(
+				`${blogData.title}`,
+				req.session,
+				res.locals);
+			pageData.data = blogData;
+			res.render('blog/blog', pageData);
+		}
+		else {
+			res.redirect('/404');
+		}
+	}) 
+	.catch(err => next(err));
 });
 
 /* POST routers **************************************************************/

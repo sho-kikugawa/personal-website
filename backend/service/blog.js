@@ -4,8 +4,13 @@
  */
 const marked = require('marked');
 const sanitizer = require('sanitize-html');
-const model = require('./mongo-dal').MongooseDal('Blog');
-const { logger, formatJson } = require("../../utils/logger");
+const model = new (require('./mongo-dal').MongooseDal)('Blogs');
+const { logger, formatJson } = require("../utils/logger");
+
+/*	Filters out everything except letters, numbers, punctuation, and 
+	non-visible characters.
+*/
+const FILTER_REGEX = /[^\p{L}\p{N}\p{P}\p{Z}]/gu;
 
 /**
  * Grabs a blog based on the URL. 
@@ -16,6 +21,8 @@ const { logger, formatJson } = require("../../utils/logger");
 async function getBlog(blogUrl) {
 	const basePath = "/blog/article/";
 	const internalTitle = blogUrl.substring(basePath.length);
+
+	logger.debug(`${internalTitle}`)
 
 	let blogData = await model.getOne({
 		internalTitle: internalTitle
@@ -51,7 +58,7 @@ async function getBlogList(pageNum, entriesPerPage=15) {
 	let data = {currentPage: -1};
 
 	if (numBlogs > 0) {
-		const blogPages = Math.floor(numBlogs / entriesPerPage) + 1;
+		const blogPages = Math.floor(numBlogs / entriesPerPage);
 		let startAt = 0;
 
 		// Cap the page number to the number maximum number of pages.
@@ -60,7 +67,7 @@ async function getBlogList(pageNum, entriesPerPage=15) {
 		}
 		
 		startAt = pageNum * entriesPerPage;
-		let blogData = await model.findManyWithSort({}, [], '-createdAt', startAt, entriesPerPage);
+		let blogData = await model.getManySorted({}, [], '-createdAt', startAt, entriesPerPage);
 		blogData.forEach(blogEntry => {
 			if (blogEntry.createdAt === undefined) {
 				return;
@@ -90,8 +97,129 @@ async function postFindBlogs(searchTerm, startAt=0) {
 	return blogData;
 }
 
+/**
+ * Handles a post request to create a new blog. If the blog exists, it will 
+ * render a page saying such. Otherwise it redirects the user to the blog
+ * page.
+ * @param {Object} req - Request object (from Express) Uses the body object
+ * 		to get the blog title, summary, and contents.
+ * @param {Object} res - Response object (from Express)
+ */
+ async function createBlog(title, summary, content) {
+	// Capping title and summary to 255 characters
+	title = sanitizer(title.substring(0, 255));
+	summary = sanitizer(summary.substring(0, 255));
+	const urlTitle = title.replace(FILTER_REGEX, '')
+		.trim()
+		.replaceAll(' ', '-')
+		.toLowerCase();
+	logger.debug(`Creating a blog: ${formatJson(req.body)}`);
+
+	let blogData = null;
+	if (await blogService.getIfBlogExists(urlTitle) === false) {
+		blogData = model.create(
+			urlTitle, 
+			title,
+			summary,
+			
+			// This will get sanitized on display
+			content);
+		logger.debug(`blogData if created: ${formatJson(blogData)}`);
+	}
+	return blogData;
+}
+
+/**
+ * Gets a blog to edit. If the blog exists, renders the publish page with the
+ * data filled out. Otherwise show that the blog does not exist.
+ * @param {Object} req - Request object (from Express). Uses the body object
+ * 		to get the blog title, summary, and contents.
+ * @param {Object} res - Response object (from Express)
+ */
+async function getBlogData(blogUrl) {
+	return await model.getOne({internalTitle: blogUrl});
+}
+
+function generatePreview(title, summary, content) {
+	let date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+	title = sanitizer(title.substring(0, 255));
+	summary = sanitizer(summary.substring(0, 255));
+	date = date.substring(0, 10);
+	let blogData = {
+		title: `PREVIEW: ${title}`,
+		summary: summary,
+		content: marked(content),
+		dateString: date
+	}
+	blogData.content = sanitizer(blogData.content, {
+		allowedTags: sanitizer.defaults.allowedTags.concat([ 'img' ])
+	});
+
+	logger.debug(`Preview blog data: ${formatJson(blogData)}`);
+	return blogData;
+}
+
+/**
+ * Handles a request to edit a blog. If the blog does not exist or there was a 
+ * problem, it renders a page saying such. If the blog was updated, it 
+ * redirects to the article page.
+ * @param {Object} req - Request object (from Express) Uses the body object
+ * 		to get the blog title, summary, and contents.
+ * @param {Object} res - Response object (from Express)
+ */
+async function updateBlog(originalUrl, title, summary, content) {
+	let updateData = {updated: false, newUrl: ''};
+	title = sanitizer(title.substring(0, 255));
+	summary = sanitizer(summary.substring(0, 255));
+	const urlTitle = title.replace(FILTER_REGEX, '')
+		.trim()
+		.replaceAll(' ', '-')
+		.toLowerCase();
+	logger.debug(`Editing a blog from ${originalUrl}`);
+
+	if (await model.checkExists({internalTitle: originalUrl}) === true) {
+		const updatedBlog = {
+			internalTitle: urlTitle,
+			title: title,
+			summary: summary,
+			content: content
+		}
+		const updateResult = await model.updateOne( 
+			{internalTitle: originalUrl},
+			updatedBlog);
+		updateData.updated = updateResult.modifiedCount === 1;
+		updateData.newUrl = urlTitle;
+		logger.debug(`Update result: ${formatJson(updateResult)}`);
+	}
+	return updateData;
+}
+
+/**
+ * Handles a post request to delete the blog.
+ * @param {Object} req - Request object (from Express) Uses the body object
+ * 		to get the blog title.
+ * @param {Object} res - Response object (from Express)
+ */
+async function deleteBlog (blogUrl) {
+	let blogDeleted = false;
+	logger.debug(`Deleting a blog: ${formatJson(blogUrl)}`);
+	if (await model.checkExists({internalTitle: blogUrl}) === true) {
+		const deleteResult = await model.deleteOne({internalTitle: blogUrl});
+		logger.debug(`Deletion result: ${formatJson(deleteResult)}`);
+		blogDeleted = deleteResult.deletedCount === 1;
+	}
+
+	return blogDeleted;
+}
+
 module.exports = {
 	getBlog,
 	getBlogList,
-	postFindBlogs
+	postFindBlogs,
+
+	createBlog,
+	getBlogData,
+	generatePreview,
+	updateBlog,
+	deleteBlog
 }

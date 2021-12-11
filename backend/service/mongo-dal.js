@@ -10,12 +10,12 @@ class MongooseDal {
 		this.model = mongoose.model(collectionName);
 	}
 
-	async createOne(data) {
+	async create(data) {
 		return await this.model.create({data}).exec();
 	}
 
-	async getOne(queryParams) {
-		return await this.model.findOne(queryParams).exec();
+	async getOne(queryParams, excludes='') {
+		return await this.model.findOne(queryParams, excludes).exec();
 	}
 
 	async getMany(queryParams, excludes, startAt=0, limit=15) {

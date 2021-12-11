@@ -13,9 +13,9 @@ each blog in blogs
 						form(action=`/editor/delete/${blog.internalTitle}`, method="post")
 							button.btn.btn-secondary Delete
 div.blog-list-nav
-	- if (currentPage === 2) 
+	- if (currentPage === 1) 
 		a.btn.btn-secondary(href=`/blogs`) Previous Page
-	- else if (currentPage > 2)
+	- else if (currentPage > 1)
 		a.btn.btn-secondary(href=`/blogs/page/${currentPage-1}`) Previous Page
 	- if (lastPage === false) 
 		a.btn.btn-secondary.blog-list-rtbtn(href=`/blogs/page/${currentPage+1}`) Next Page

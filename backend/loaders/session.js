@@ -1,4 +1,4 @@
-const { logger } = require('../utils/logger');
+const { logger, formatJson } = require('../utils/logger');
 
 function load(app, sessionConfig) {
 	let sessionParams = {
@@ -6,8 +6,8 @@ function load(app, sessionConfig) {
 		secret: sessionConfig.secret,
 		resave: false,
 		cookie: { 
-			maxAge: sessionConfig.ttl,
-			secure: true,
+			maxAge: parseInt(sessionConfig.ttl),
+			secure: false,
 		},
 		saveUninitialized: true
 	};
@@ -17,8 +17,8 @@ function load(app, sessionConfig) {
 		const expressSession = require('express-session');
 		const redis = require('redis');
 		const redisClient = redis.createClient();
-		const redisStore = connectRedis(expressSession);
 		const connectRedis = require('connect-redis');
+		const redisStore = connectRedis(expressSession);
 		logger.info(`Using Redis sessioning`);
 	
 		redisClient.auth(sessionConfig.dbPassword);

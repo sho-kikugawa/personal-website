@@ -21,10 +21,10 @@ const mongoose = require('mongoose')
  */
 function setup(dbParameters, schemaFiles=[]){
 	mongoose.Promise = global.Promise;
-	const MONGO_DB_URI = `mongodb://${dbParameters.ipAddress}:${dbParameters.portNumber}`
+	const MONGO_DB_URI = `mongodb://${dbParameters.url}:${dbParameters.port}`
 	
 	let mongooseOptions = {
-		dbName: dbParameters.dbName,
+		dbName: dbParameters.name,
 		user: dbParameters.username,
 		pass: dbParameters.password
 	};
@@ -33,9 +33,10 @@ function setup(dbParameters, schemaFiles=[]){
 		mongooseOptions.authSource = "admin";
 	}
 
-	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`)
-	logger.debug('[MongoDB] Connecting using options %o', mongooseOptions)
-	mongoose.connect(MONGO_DB_URI, mongooseOptions)
+	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`);
+	logger.debug('[MongoDB] Connecting using options %o', mongooseOptions);
+	logger.debug(`Schema files: ${schemaFiles}`);
+	mongoose.connect(MONGO_DB_URI, mongooseOptions);
 	mongoose.connection
 		.once('open', () => {
 			logger.info(`[MongoDB] Connected to ${MONGO_DB_URI}`)
@@ -44,7 +45,7 @@ function setup(dbParameters, schemaFiles=[]){
 			logger.error('[MongoDB] Connection error : ', error);
 		});
 	schemaFiles.forEach(schemaFile => {
-		require(schemaFile)
+		require(schemaFile);
 	})
 }
 
