@@ -7,7 +7,7 @@ function load(app, sessionConfig) {
 		resave: false,
 		cookie: { 
 			maxAge: parseInt(sessionConfig.ttl),
-			secure: false,
+			secure: true,
 		},
 		saveUninitialized: true
 	};
