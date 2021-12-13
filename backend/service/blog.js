@@ -113,17 +113,16 @@ async function postFindBlogs(searchTerm, startAt=0) {
 		.trim()
 		.replaceAll(' ', '-')
 		.toLowerCase();
-	logger.debug(`Creating a blog: ${formatJson(req.body)}`);
+	logger.debug(`Creating blog ${title}`);
 
 	let blogData = null;
-	if (await blogService.getIfBlogExists(urlTitle) === false) {
-		blogData = model.create(
-			urlTitle, 
-			title,
-			summary,
-			
-			// This will get sanitized on display
-			content);
+	if (await model.checkExists({internalTitle: urlTitle}) === false) {
+		blogData = model.create({
+			internalTitle: urlTitle, 
+			title: title,
+			summary: summary,
+			content: content // This will get sanitized on display
+		});
 		logger.debug(`blogData if created: ${formatJson(blogData)}`);
 	}
 	return blogData;

@@ -36,19 +36,37 @@ function setup(dbParameters, schemaFiles=[]){
 	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`);
 	logger.debug('[MongoDB] Connecting using options %o', mongooseOptions);
 	logger.debug(`Schema files: ${schemaFiles}`);
-	mongoose.connect(MONGO_DB_URI, mongooseOptions);
 	mongoose.connection
-		.once('open', () => {
-			logger.info(`[MongoDB] Connected to ${MONGO_DB_URI}`)
-		})
-		.on('error', (error) => {
-			logger.error('[MongoDB] Connection error : ', error);
-		});
+	.once('open', () => {
+		logger.info(`[MongoDB] Connected to ${MONGO_DB_URI}`)
+	})
+	.on('error', (error) => {
+		logger.error('[MongoDB] Connection error : ', error);
+	});
+	mongoose.connect(MONGO_DB_URI, mongooseOptions);
+
 	schemaFiles.forEach(schemaFile => {
 		require(schemaFile);
 	})
 }
 
+/**
+ * Gets the connection state to the database
+ * @returns MongoDB connection state
+ */
+ function getConnectionState() {
+	return mongoose.connection.readyState
+}
+
+/**
+ * Closes the MongoDB connection
+ */
+function closeConnection() {
+	mongoose.connection.close()
+}
+
 module.exports = {
-	setup
+	setup,
+	getConnectionState,
+	closeConnection
 }

@@ -11,7 +11,7 @@ class MongooseDal {
 	}
 
 	async create(data) {
-		return await this.model.create({data}).exec();
+		return await this.model.create(data);
 	}
 
 	async getOne(queryParams, excludes='') {
