@@ -1,16 +1,13 @@
-const fs = require('fs');
-const path = require('path');
 const prompt = require('prompt-sync')({sigint: true});
 const config = require('../config/config')();
 const mongo = require('../loaders/mongo-db');
+const mongoose = require('mongoose');
+require('../models/editor-schema');
+const model = mongoose.model('Editor');
 
 (async() => {
-	const dbSchemas = []; 
-	fs.readdirSync('./models').forEach(file => {
-		dbSchemas.push(path.join(__dirname, '../models', file));
-	})
-	console.log('Connecting to database...')
-	mongo.setup(config.database, dbSchemas);
+	console.log('Connecting to database...');
+	mongo.setup(config.database.mongo);
 	await new Promise(resolve => setTimeout(resolve, 100));
 
 	let command = '';
@@ -21,10 +18,13 @@ const mongo = require('../loaders/mongo-db');
 		command = command.toLocaleLowerCase();
 
 		if(command === 'a') {
-			console.log(await createAccount());
+			console.log(await createEditor());
+		}
+		if(command === 'l') {
+			console.log(await listEditors());
 		}
 		else if (command === 'd') {
-			console.log(await deleteAccount());
+			console.log(await deleteEditor());
 		}
 	}
 	process.exit(1);
@@ -32,33 +32,35 @@ const mongo = require('../loaders/mongo-db');
 
 function printPrompt() {
 	console.log('Enter command:\n',
-	'  (A)dd account\n',
-	'  (D)elete account\n',
+	'  (A)dd editor\n',
+	'  (L)ist editors\n',
+	'  (D)elete editor\n',
 	'  (Q)uit\n');
 }
 
-async function createAccount() {
+async function createEditor() {
 	const {generateKey, getPasswordHash} = require('../utils/crypto');
-	const model = new (require('../service/mongo-dal').MongooseDal)('Editor');
 
 	let username = prompt('Input a new username: ');
 	let password = prompt('Input password: ', {echo: '*'});
 	const salt = generateKey();
 	const hash = await getPasswordHash(password, salt);
-	const accountData = await model.create({
+	const editorData = model.create({
 		editorId: generateKey(),
 		username: username,
 		password: hash
 	});
 
-	return accountData;
+	return editorData;
 }
 
-async function deleteAccount() {
-	const model = new (require('../service/mongo-dal').MongooseDal)('Editor');
+async function listEditors() {
+	return await model.find().select('username');
+}
 
+async function deleteEditor() {
 	let username = prompt('Enter username to delete: ');
-	const accountData = await model.deleteOne({username: username});
+	const editorData = await model.deleteOne({username: username});
 
-	return accountData;
+	return editorData;
 }

@@ -1,7 +1,6 @@
 /**
  * @file Main app configuration.
  */
-const fs = require('fs');
 const path = require('path');
 
 /* Setup environment ********************************************************/
@@ -11,11 +10,10 @@ logger.debug(`Config: ${formatJson(config)}`);
 
 /* Setup DB ******************************************************************/
 /* Build the database schema file list */
-const dbSchemas = []; 
-fs.readdirSync('./models').forEach(file => {
-	dbSchemas.push(path.join(__dirname, 'models', file));
-})
-require('./loaders/mongo-db').setup(config.database, dbSchemas);
+const mongoLoader = require('./loaders/mongo-db');
+const redisLoader = require('./loaders/redis-db');
+mongoLoader.setup(config.database.mongo);
+redisLoader.startClient(config.database.redis, 'Editors');
 
 /* Create Express Instance ***************************************************/
 const express = require('express');
@@ -32,7 +30,7 @@ const clientPaths = {
 require('./loaders/server-middleware')(app, clientPaths);
 
 /* Load and setup sessioning *************************************************/
-require('./loaders/session')(app, config.session);
+require('./loaders/session')(app, config.session, redisLoader.getClient('Editors'));
 
 /* Setup Routes **************************************************************/
 const staticRoutesPath = path.join(__dirname, 'routes');

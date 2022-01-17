@@ -2,7 +2,9 @@
  * @file Controller for handling all routes pertaining to editor functions,
  * 		including logging in and creating, editing, and deleting blogs.
  */
-const model = new (require('./mongo-dal').MongooseDal)('Editor');
+require('../models/editor-schema');
+const mongoose = require('mongoose');
+const model = mongoose.model('Editor')
 const { logger, formatJson } = require(`../utils/logger`);
 const { verifyPassword } = require(`../utils/crypto`);
 
@@ -13,14 +15,9 @@ const { verifyPassword } = require(`../utils/crypto`);
  * @param {Object} res - Response object (from Express)
  */
 async function editorLogin(username, password) {
-	let editorData = await model.getOne({"username": username});
-	if (editorData === null) {
-		return editorData;
-	}
-	logger.debug(`${formatJson(editorData)}`)
-	let passwordMatch = false;
-	passwordMatch = await verifyPassword(editorData.password, password);
-	if(passwordMatch === true) {
+	let editorData = await model.findOne({'username': username});
+	if (editorData !== null && await verifyPassword(editorData.password, password) === true) {
+		logger.debug(`${formatJson(editorData)}`);
 		return editorData;
 	}
 	else {

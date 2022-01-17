@@ -151,7 +151,36 @@ router.post('/login', loginSpeedLimiter, (req, res) => {
 			res.render('editor/response', pageData);
 		}) 
 	}
-	
+});
+
+router.post('/login-axios', loginSpeedLimiter, (req, res) => {
+	logger.debug(req.body)
+	if (!req.body.editorUsername || !req.body.editorPassword) {
+		let pageData = new RenderData('Login error', req.session, res.locals);
+		pageData.message = 'No username or password given';
+		res.json({status: false});
+	}
+	else {
+		editorLogin(req.body.editorUsername, req.body.editorPassword)
+		.then(editorData => {
+			let pageData = new RenderData('', req.session, res.locals);
+			if (editorData !== null) {
+				logger.info(`Editor ${editorData.username} logged in.`);
+				res.cookie(config.session.name, 'value', {
+					editor: editorData.editorId
+				});
+				req.session.editor = editorData.editorId;
+				req.session.save();
+				pageData.updateTitle('Login success');
+				pageData.message = 'You\'re logged in!';
+			}
+			else {
+				pageData.updateTitle('Login error');
+				pageData.message = 'Username or password is incorrect';
+			}
+			res.json(editorData);
+		}) 
+	}
 });
 
 router.post('/logout', (req, res) => {

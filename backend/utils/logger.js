@@ -11,9 +11,9 @@ require('winston-daily-rotate-file');
  * Get the environment this module is running under.
  **/
 function getEnvironment() {
-	if (process.env.NODE_ENV === 'development') {
+	if (process.env.LOG_LEVEL === 'development') {
 		return 'debug'
-	} else if (process.env.NODE_ENV === 'verbose') {
+	} else if (process.env.LOG_LEVEL === 'verbose') {
 		return 'verbose'
 	} else {
 		return 'info'

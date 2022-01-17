@@ -19,7 +19,7 @@ const mongoose = require('mongoose')
  * @param {String[]} schemaFiles - Array of strings containing the paths to the
  * 		schema files.
  */
-function setup(dbParameters, schemaFiles=[]){
+async function setup(dbParameters){
 	mongoose.Promise = global.Promise;
 	const MONGO_DB_URI = `mongodb://${dbParameters.url}:${dbParameters.port}`
 	
@@ -35,19 +35,19 @@ function setup(dbParameters, schemaFiles=[]){
 
 	logger.info(`[MongoDB] Attempting to connect to ${MONGO_DB_URI}`);
 	logger.debug('[MongoDB] Connecting using options %o', mongooseOptions);
-	logger.debug(`Schema files: ${schemaFiles}`);
+
 	mongoose.connection
 	.once('open', () => {
 		logger.info(`[MongoDB] Connected to ${MONGO_DB_URI}`)
 	})
 	.on('error', (error) => {
 		logger.error('[MongoDB] Connection error : ', error);
-	});
-	mongoose.connect(MONGO_DB_URI, mongooseOptions);
-
-	schemaFiles.forEach(schemaFile => {
-		require(schemaFile);
 	})
+	.on('disconnected', () => {
+		logger.info('[MongDB] Server disconneceted from database.')
+	});
+	await mongoose.connect(MONGO_DB_URI, mongooseOptions)
+	.catch(err => { logger.error(err)});
 }
 
 /**
@@ -61,8 +61,8 @@ function setup(dbParameters, schemaFiles=[]){
 /**
  * Closes the MongoDB connection
  */
-function closeConnection() {
-	mongoose.connection.close()
+async function closeConnection() {
+	await mongoose.connection.close();
 }
 
 module.exports = {

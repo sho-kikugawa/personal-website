@@ -19,6 +19,12 @@ router.get('/about', (req, res) => {
 	res.render('about', data);
 })
 
+router.get('/test', (req, res) => {
+	const data = new RenderData('Test', req.session, res.locals);
+	res.render('test', data);
+})
+
+
 module.exports = {
 	router,
 	basepath

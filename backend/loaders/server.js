@@ -31,7 +31,8 @@ function load(app, config) {
 			res.locals.message = "The server encountered a problem 🙁"
 			res.locals.error = {}
 		}
-
+		logger.error(`${err.message}\n${err.stack}`);
+		
 		// render the error page
 		res.status(err.status || 500)
 		let data = new RenderData('Website error', req.session, res.locals);
@@ -42,7 +43,6 @@ function load(app, config) {
 
 	/* Create and start server ***************************************************/
 	if (config.certs.certFile && config.certs.keyFile) {
-		
 		let server = http.createServer(app);
 		const certFilename = path.join(__dirname, '..', config.certs.path, config.certs.certFile);
 		const keyFilename = path.join(__dirname, '..', config.certs.path, config.certs.keyFile);

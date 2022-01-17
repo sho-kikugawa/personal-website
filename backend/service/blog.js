@@ -2,9 +2,11 @@
  * @file Service for retrieving blog data from the database, processing it, and
  * returning it to the router so it can take the appropriate action.
  */
+require('../models/blog-schema');
+const mongoose = require('mongoose');
+const model = mongoose.model('Blogs');
 const marked = require('marked');
 const sanitizer = require('sanitize-html');
-const model = new (require('./mongo-dal').MongooseDal)('Blogs');
 const { logger, formatJson } = require("../utils/logger");
 
 /*	Filters out everything except letters, numbers, punctuation, and 
@@ -24,7 +26,7 @@ async function getBlog(blogUrl) {
 
 	logger.debug(`${internalTitle}`)
 
-	let blogData = await model.getOne({
+	let blogData = await model.findOne({
 		internalTitle: internalTitle
 	});
 	
@@ -35,7 +37,7 @@ async function getBlog(blogUrl) {
 		let date = blogData.createdAt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 		date = date.substring(0, 10);
 		blogData.dateString = date;
-		blogData.content = marked(blogData.content);
+		blogData.content = marked.parse(blogData.content);
 		blogData.content = sanitizer(blogData.content, {
 			allowedTags: sanitizer.defaults.allowedTags.concat([ 'img' ])
 		});
@@ -54,7 +56,7 @@ async function getBlog(blogUrl) {
  * @returns Returns an array of blog entries.
  */
 async function getBlogList(pageNum, entriesPerPage=15) {
-	const numBlogs = await model.getDocCount();
+	const numBlogs = await model.countDocuments();
 	let data = {currentPage: -1};
 
 	if (numBlogs > 0) {
@@ -67,7 +69,11 @@ async function getBlogList(pageNum, entriesPerPage=15) {
 		}
 		
 		startAt = pageNum * entriesPerPage;
-		let blogData = await model.getManySorted({}, [], '-createdAt', startAt, entriesPerPage);
+		let blogData = await model.find()
+			.select('-createdAt')
+			.skip(startAt)
+			.limit(entriesPerPage)
+			.exec();
 		blogData.forEach(blogEntry => {
 			if (blogEntry.createdAt === undefined) {
 				return;
@@ -116,7 +122,7 @@ async function postFindBlogs(searchTerm, startAt=0) {
 	logger.debug(`Creating blog ${title}`);
 
 	let blogData = null;
-	if (await model.checkExists({internalTitle: urlTitle}) === false) {
+	if (await model.exists({internalTitle: urlTitle}) === false) {
 		blogData = model.create({
 			internalTitle: urlTitle, 
 			title: title,
@@ -136,7 +142,7 @@ async function postFindBlogs(searchTerm, startAt=0) {
  * @param {Object} res - Response object (from Express)
  */
 async function getBlogData(blogUrl) {
-	return await model.getOne({internalTitle: blogUrl});
+	return await model.findOne({internalTitle: blogUrl});
 }
 
 function generatePreview(title, summary, content) {
@@ -147,7 +153,7 @@ function generatePreview(title, summary, content) {
 	let blogData = {
 		title: `PREVIEW: ${title}`,
 		summary: summary,
-		content: marked(content),
+		content: marked.parse(content),
 		dateString: date
 	}
 	blogData.content = sanitizer(blogData.content, {
@@ -176,7 +182,7 @@ async function updateBlog(originalUrl, title, summary, content) {
 		.toLowerCase();
 	logger.debug(`Editing a blog from ${originalUrl}`);
 
-	if (await model.checkExists({internalTitle: originalUrl}) === true) {
+	if (await model.exists({internalTitle: originalUrl}) === true) {
 		const updatedBlog = {
 			internalTitle: urlTitle,
 			title: title,
@@ -202,7 +208,7 @@ async function updateBlog(originalUrl, title, summary, content) {
 async function deleteBlog (blogUrl) {
 	let blogDeleted = false;
 	logger.debug(`Deleting a blog: ${formatJson(blogUrl)}`);
-	if (await model.checkExists({internalTitle: blogUrl}) === true) {
+	if (await model.exists({internalTitle: blogUrl}) === true) {
 		const deleteResult = await model.deleteOne({internalTitle: blogUrl});
 		logger.debug(`Deletion result: ${formatJson(deleteResult)}`);
 		blogDeleted = deleteResult.deletedCount === 1;

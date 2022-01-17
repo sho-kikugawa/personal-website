@@ -8,7 +8,6 @@ class RenderData {
 		this.loggedIn = 'editor' in session;
 		this.scriptNonce = locals.scriptNonce;
 		this.styleNonce = locals.styleNonce;
-		console.log(session)
 	}
 
 	updateTitle(title) {

@@ -4,15 +4,30 @@
 const mongoose = require('mongoose');
 
 let BlogSchema = new mongoose.Schema({
-	internalTitle: {		// Primary key for getting blogs
+	internalTitle: {
 		type: String,
-		trime: true,
+		trim: true,
 		unique: true
-	},	// 
-	title: String,			// Big bold title
-	summary: String,		// Short summary of article
-	content: String,		// Markdown content of the article
-	tags: [String],			// Array of tags
+	},
+
+	title: {
+		type: String,
+		trim: true,
+		default: '',
+	},
+
+	summary: {
+		type: String,
+		trim: true,
+		default: '',
+	},
+
+	content: {
+		type: String,
+		default: '',
+	},
+
+	tags: [String],
 },
 {timestamps: true}); 
 
